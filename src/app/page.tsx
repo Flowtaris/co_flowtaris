@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import Image from 'next/image';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function Home() {
