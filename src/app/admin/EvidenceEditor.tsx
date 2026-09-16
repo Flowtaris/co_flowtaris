@@ -10,14 +10,14 @@ const DEFAULT_DATA = {
     { id: "legal", num: "02", title: "LEGAL", desc: "The agreements, policies and governance material\nbehind our commercial relationships.", docs: ["MSA", "DPA", "SUBPROCESSORS", "INSURANCE"], cta: "EXPLORE LEGAL →" },
     { id: "operations", num: "03", title: "OPERATIONS", desc: "How we deliver, support and recover\nwhen things don't go according to plan.", docs: ["SLA", "RTO / RPO", "CHANGE MANAGEMENT", "ESCALATION"], cta: "EXPLORE OPERATIONS →" }
   ],
-  library: { title: "DOCUMENT LIBRARY", documents: [
-    { name: "SOC 2 REPORT", type: "PDF", updated: "MAR 2026", category: "SECURITY" },
-    { name: "Information Security Policy", type: "PDF", updated: "FEB 2026", category: "SECURITY" },
-    { name: "Incident Response Plan", type: "PDF", updated: "FEB 2026", category: "SECURITY" },
-    { name: "Business Continuity Plan", type: "PDF", updated: "JAN 2026", category: "OPERATIONS" },
-    { name: "Subprocessor List", type: "PDF", updated: "JAN 2026", category: "LEGAL" },
-    { name: "Cyber Insurance Certificate", type: "PDF", updated: "DEC 2025", category: "LEGAL" },
-    { name: "Data Processing Agreement", type: "PDF", updated: "DEC 2025", category: "LEGAL" }
+  library: { title: "DOCUMENT LIBRARY", colDocument: "DOCUMENT", colType: "TYPE", colUpdated: "UPDATED", colAction: "ACTION", documents: [
+    { name: "SOC 2 REPORT", type: "PDF", updated: "MAR 2026", category: "SECURITY", url: "#", cta: "DOWNLOAD →" },
+    { name: "Information Security Policy", type: "PDF", updated: "FEB 2026", category: "SECURITY", url: "#", cta: "DOWNLOAD →" },
+    { name: "Incident Response Plan", type: "PDF", updated: "FEB 2026", category: "SECURITY", url: "#", cta: "DOWNLOAD →" },
+    { name: "Business Continuity Plan", type: "PDF", updated: "JAN 2026", category: "OPERATIONS", url: "#", cta: "DOWNLOAD →" },
+    { name: "Subprocessor List", type: "PDF", updated: "JAN 2026", category: "LEGAL", url: "#", cta: "DOWNLOAD →" },
+    { name: "Cyber Insurance Certificate", type: "PDF", updated: "DEC 2025", category: "LEGAL", url: "#", cta: "DOWNLOAD →" },
+    { name: "Data Processing Agreement", type: "PDF", updated: "DEC 2025", category: "LEGAL", url: "#", cta: "DOWNLOAD →" }
   ] },
   questionnaire: { label: "PROCUREMENT QUESTIONNAIRE", title: "DON'T SEND US YOUR QUESTIONNAIRE FIRST.\nSTART WITH OURS.", desc: "We've pre-filled the information procurement teams\nusually need before a technical conversation.", items: [
     { name: "SECURITY QUESTIONNAIRE", type: "XLSX", href: "#" },
@@ -67,10 +67,7 @@ export default function EvidenceEditor({ site }: { site: string }) {
   }, [site]);
 
   useEffect(() => {
-    if (saveStatus) {
-      const timer = setTimeout(() => setSaveStatus(null), 4000);
-      return () => clearTimeout(timer);
-    }
+    if (saveStatus) { const timer = setTimeout(() => setSaveStatus(null), 4000); return () => clearTimeout(timer); } return undefined;
   }, [saveStatus]);
 
   async function save() {
@@ -152,16 +149,32 @@ export default function EvidenceEditor({ site }: { site: string }) {
       <div style={{ background: "#fff", borderRadius: 12, padding: 32, border: "1px solid #E5E7EB", marginBottom: 24 }}>
         <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Document Library</h2>
         <input value={data.library.title || ""} onChange={e => update("library", "title", e.target.value)} placeholder="Section Title" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 16 }} />
+        
+        <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Column Names</h3>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, marginBottom: 16 }}>
+          <input value={data.library.colDocument || ""} onChange={e => update("library", "colDocument", e.target.value)} placeholder="Col 1 (DOCUMENT)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
+          <input value={data.library.colType || ""} onChange={e => update("library", "colType", e.target.value)} placeholder="Col 2 (TYPE)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
+          <input value={data.library.colUpdated || ""} onChange={e => update("library", "colUpdated", e.target.value)} placeholder="Col 3 (UPDATED)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
+          <input value={data.library.colAction || ""} onChange={e => update("library", "colAction", e.target.value)} placeholder="Col 4 (ACTION)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
+        </div>
+
+        <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Documents</h3>
         {(data.library.documents || []).map((doc: any, i: number) => (
-          <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr auto", gap: 8, marginBottom: 8 }}>
-            <input value={doc.name || ""} onChange={e => { const arr = [...data.library.documents]; arr[i].name = e.target.value; update("library", "documents", arr); }} placeholder="Name" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
-            <input value={doc.type || ""} onChange={e => { const arr = [...data.library.documents]; arr[i].type = e.target.value; update("library", "documents", arr); }} placeholder="Type (e.g. PDF)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
-            <input value={doc.updated || ""} onChange={e => { const arr = [...data.library.documents]; arr[i].updated = e.target.value; update("library", "documents", arr); }} placeholder="Updated (e.g. MAR 2026)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
-            <input value={doc.category || ""} onChange={e => { const arr = [...data.library.documents]; arr[i].category = e.target.value; update("library", "documents", arr); }} placeholder="Category" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
-            <button onClick={() => { const arr = [...data.library.documents]; arr.splice(i, 1); update("library", "documents", arr); }} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 12px", border: "none", borderRadius: 6, cursor: "pointer" }}>✕</button>
+          <div key={i} style={{ border: "1px solid #E5E7EB", padding: 12, borderRadius: 8, marginBottom: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr auto", gap: 8, marginBottom: 8 }}>
+              <input value={doc.name || ""} onChange={e => { const arr = [...data.library.documents]; arr[i].name = e.target.value; update("library", "documents", arr); }} placeholder="Name" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
+              <input value={doc.type || ""} onChange={e => { const arr = [...data.library.documents]; arr[i].type = e.target.value; update("library", "documents", arr); }} placeholder="Type (e.g. PDF)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
+              <input value={doc.updated || ""} onChange={e => { const arr = [...data.library.documents]; arr[i].updated = e.target.value; update("library", "documents", arr); }} placeholder="Updated (e.g. MAR 2026)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
+              <input value={doc.category || ""} onChange={e => { const arr = [...data.library.documents]; arr[i].category = e.target.value; update("library", "documents", arr); }} placeholder="Category" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
+              <button onClick={() => { const arr = [...data.library.documents]; arr.splice(i, 1); update("library", "documents", arr); }} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 12px", border: "none", borderRadius: 6, cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input value={doc.cta || ""} onChange={e => { const arr = [...data.library.documents]; arr[i].cta = e.target.value; update("library", "documents", arr); }} placeholder="CTA Text (e.g. DOWNLOAD →)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+              <input value={doc.url || ""} onChange={e => { const arr = [...data.library.documents]; arr[i].url = e.target.value; update("library", "documents", arr); }} placeholder="URL (e.g. https://...)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 2 }} />
+            </div>
           </div>
         ))}
-        <button onClick={() => { const arr = [...(data.library.documents || []), { name: "", type: "", updated: "", category: "" }]; update("library", "documents", arr); }} style={{ background: "#E5E7EB", padding: "8px 16px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500, marginTop: 8 }}>+ Add Document</button>
+        <button onClick={() => { const arr = [...(data.library.documents || []), { name: "", type: "", updated: "", category: "", url: "", cta: "DOWNLOAD →" }]; update("library", "documents", arr); }} style={{ background: "#E5E7EB", padding: "8px 16px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500, marginTop: 8 }}>+ Add Document</button>
       </div>
 
       {/* Questionnaire */}

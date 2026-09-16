@@ -67,20 +67,20 @@ export default function EvidenceClient({ data }: { data: any }) {
           <table className="ev-table">
             <thead>
               <tr>
-                <th className="ev-th">DOCUMENT</th>
-                <th className="ev-th">TYPE</th>
-                <th className="ev-th">UPDATED</th>
-                <th className="ev-th" style={{ textAlign: 'right' }}>ACTION</th>
+                <th className="ev-th">{data.library.colDocument || "DOCUMENT"}</th>
+                <th className="ev-th">{data.library.colType || "TYPE"}</th>
+                <th className="ev-th">{data.library.colUpdated || "UPDATED"}</th>
+                <th className="ev-th" style={{ textAlign: 'right' }}>{data.library.colAction || "ACTION"}</th>
               </tr>
             </thead>
             <tbody>
               {(data.library.documents || []).map((doc: any, i: number) => (
                 <tr key={i} className="ev-tr">
-                  <td className="ev-td ev-td-name">{doc.name.toUpperCase()}</td>
+                  <td className="ev-td ev-td-name">{(doc.name || "").toUpperCase()}</td>
                   <td className="ev-td">{doc.type}</td>
                   <td className="ev-td">{doc.updated}</td>
                   <td className="ev-td" style={{ textAlign: 'right' }}>
-                    <a href="#" className="judgment-cta ev-dl-link">DOWNLOAD &rarr;</a>
+                    <a href={doc.url || "#"} className="judgment-cta ev-dl-link">{doc.cta || "DOWNLOAD \u2192"}</a>
                   </td>
                 </tr>
               ))}

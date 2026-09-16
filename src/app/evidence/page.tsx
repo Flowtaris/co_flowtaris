@@ -9,14 +9,14 @@ const DEFAULT_DATA = {
     { id: "legal", num: "02", title: "LEGAL", desc: "The agreements, policies and governance material\nbehind our commercial relationships.", docs: ["MSA", "DPA", "SUBPROCESSORS", "INSURANCE"], cta: "EXPLORE LEGAL →" },
     { id: "operations", num: "03", title: "OPERATIONS", desc: "How we deliver, support and recover\nwhen things don't go according to plan.", docs: ["SLA", "RTO / RPO", "CHANGE MANAGEMENT", "ESCALATION"], cta: "EXPLORE OPERATIONS →" }
   ],
-  library: { title: "DOCUMENT LIBRARY", documents: [
-    { name: "SOC 2 REPORT", type: "PDF", updated: "MAR 2026", category: "SECURITY" },
-    { name: "Information Security Policy", type: "PDF", updated: "FEB 2026", category: "SECURITY" },
-    { name: "Incident Response Plan", type: "PDF", updated: "FEB 2026", category: "SECURITY" },
-    { name: "Business Continuity Plan", type: "PDF", updated: "JAN 2026", category: "OPERATIONS" },
-    { name: "Subprocessor List", type: "PDF", updated: "JAN 2026", category: "LEGAL" },
-    { name: "Cyber Insurance Certificate", "type": "PDF", updated: "DEC 2025", category: "LEGAL" },
-    { name: "Data Processing Agreement", "type": "PDF", updated: "DEC 2025", category: "LEGAL" }
+  library: { title: "DOCUMENT LIBRARY", colDocument: "DOCUMENT", colType: "TYPE", colUpdated: "UPDATED", colAction: "ACTION", documents: [
+    { name: "SOC 2 REPORT", type: "PDF", updated: "MAR 2026", category: "SECURITY", url: "#", cta: "DOWNLOAD →" },
+    { name: "Information Security Policy", type: "PDF", updated: "FEB 2026", category: "SECURITY", url: "#", cta: "DOWNLOAD →" },
+    { name: "Incident Response Plan", type: "PDF", updated: "FEB 2026", category: "SECURITY", url: "#", cta: "DOWNLOAD →" },
+    { name: "Business Continuity Plan", type: "PDF", updated: "JAN 2026", category: "OPERATIONS", url: "#", cta: "DOWNLOAD →" },
+    { name: "Subprocessor List", type: "PDF", updated: "JAN 2026", category: "LEGAL", url: "#", cta: "DOWNLOAD →" },
+    { name: "Cyber Insurance Certificate", type: "PDF", updated: "DEC 2025", category: "LEGAL", url: "#", cta: "DOWNLOAD →" },
+    { name: "Data Processing Agreement", type: "PDF", updated: "DEC 2025", category: "LEGAL", url: "#", cta: "DOWNLOAD →" }
   ] },
   questionnaire: { label: "PROCUREMENT QUESTIONNAIRE", title: "DON'T SEND US YOUR QUESTIONNAIRE FIRST.\nSTART WITH OURS.", desc: "We've pre-filled the information procurement teams\nusually need before a technical conversation.", items: [
     { name: "SECURITY QUESTIONNAIRE", type: "XLSX", href: "#" },
