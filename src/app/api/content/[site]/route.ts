@@ -1,6 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 function getClient(site: string) {
   const SITE_CONFIG: Record<string, { url: string; key: string }> = {
     com: {
