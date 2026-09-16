@@ -7,7 +7,7 @@ export default function JudgmentPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTag, setActiveTag] = useState("ALL");
   const [activeAuthor, setActiveAuthor] = useState("AUTHOR / ALL");
-  const [activeYear, setActiveYear] = useState("YEAR / 2026");
+  const [activeYear, setActiveYear] = useState("YEAR / ALL");
   const [visibleCount, setVisibleCount] = useState(10);
   
   const [decisionLogs, setDecisionLogs] = useState<any[]>([]);
@@ -58,9 +58,13 @@ export default function JudgmentPage() {
     fetchData();
   }, []);
 
-  const formatText = (text: string) => {
+  const formatText = (text: any) => {
     if (!text) return null;
-    return text.split(/\\n|\n/).map((line, i, arr) => (
+    if (typeof text !== 'string') {
+      if (text.statement) return text.statement; // Handle principle object
+      return JSON.stringify(text);
+    }
+    return text.split(/\\n|\n/).map((line: string, i: number, arr: string[]) => (
       <span key={i}>
         {line}
         {i < arr.length - 1 && <br />}
@@ -75,11 +79,12 @@ export default function JudgmentPage() {
   // Filter logic
   const filteredLogs = decisionLogs.filter((log) => {
     // 1. Search filter
+    const principleText = typeof log.principle === 'string' ? log.principle : (log.principle?.statement || "");
     const matchesSearch = 
       searchQuery === "" || 
-      log.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      log.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      log.principle.toLowerCase().includes(searchQuery.toLowerCase());
+      (log.title && log.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (log.excerpt && log.excerpt.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (principleText.toLowerCase().includes(searchQuery.toLowerCase()));
 
     // 2. Tag filter
     const matchesTag = activeTag === "ALL" || log.tags.includes(activeTag);
@@ -197,7 +202,7 @@ export default function JudgmentPage() {
               </div>
               <h2 className="judgment-title section-heading" style={{ maxWidth: index === 0 ? "none" : "800px" }}>{formatText(log.title)}</h2>
               <div className="judgment-desc" style={{ whiteSpace: "normal", maxWidth: index === 0 ? "700px" : "600px", fontSize: index === 0 ? "1.5rem" : "1.125rem" }}>
-                {formatText(log.excerpt)}
+                {log.excerpt ? formatText(log.excerpt) : "See details in decision log."}
               </div>
               <div className="judgment-principle">
                 {formatText(log.principle)}
