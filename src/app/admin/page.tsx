@@ -17,6 +17,7 @@ import EvidenceEditor from "./EvidenceEditor";
 import ContactEditor from "./ContactEditor";
 import QuestionnaireEditor from "./QuestionnaireEditor";
 import RegisterEditor from "./RegisterEditor";
+import HomeSectionsEditor from "./HomeSectionsEditor";
 
 // ── Icons ──────────────────────────────────────────────────────────
 import {
@@ -38,8 +39,9 @@ import {
 const sidebarLinks = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
   { id: "hero", label: "Homepage & Hero", icon: <Type size={18} /> },
-  { id: "trust", label: "Systems of Trust", icon: <ShieldCheck size={18} /> },
-  { id: "judgment", label: "Judgment Logs", icon: <Scale size={18} /> },
+  { id: "hero", label: "Hero (Home)", icon: <LayoutDashboard size={18} /> },
+  { id: "home_sections", label: "Homepage Content", icon: <LayoutDashboard size={18} /> },
+  { id: "judgment", label: "Judgment Page", icon: <Scale size={18} /> },
   { id: "judgment_slugs", label: "Judgment Slugs", icon: <FileText size={18} /> },
   { id: "principles", label: "Principles", icon: <BookOpen size={18} /> },
   { id: "statement", label: "Trust Statement", icon: <MessageSquare size={18} /> },
@@ -171,7 +173,8 @@ export default function AdminPage() {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 24 }}>
                 <DashboardCard icon={<Type size={20} color="#3B82F6" />} iconBg="#EFF6FF" title="Homepage & Hero" description="Edit the global hero text, subtitles, and the main messaging of the site." actions={[{ label: "Manage Hero →", onClick: () => setActiveTab("hero") }]} />
                 <DashboardCard icon={<FileBox size={20} color="#8B5CF6" />} iconBg="#F5F3FF" title="PDF Resources" description="Add, update, or remove downloadable PDF documents from the main page." actions={[{ label: "Manage PDFs →", onClick: () => setActiveTab("resources") }]} />
-                <DashboardCard icon={<ShieldCheck size={20} color="#10B981" />} iconBg="#ECFDF5" title="Systems of Trust" description="Manage the three core pillars: Judgment, Evidence, and Leverage." actions={[{ label: "Manage Systems →", onClick: () => setActiveTab("trust") }]} />
+                <DashboardCard icon={<LayoutDashboard size={20} color="#3B82F6" />} iconBg="#EFF6FF" title="Hero Section (Home)" description="Manage the primary H1, sub-headline, and the hero image." actions={[{ label: "Manage Hero →", onClick: () => setActiveTab("hero") }]} />
+                <DashboardCard icon={<LayoutDashboard size={20} color="#3B82F6" />} iconBg="#EFF6FF" title="Homepage Content" description="Manage the featured judgment logs, trust statements, and final CTAs on the homepage." actions={[{ label: "Manage Content →", onClick: () => setActiveTab("home_sections") }]} />
                 <DashboardCard icon={<Scale size={20} color="#F59E0B" />} iconBg="#FFFBEB" title="Judgment Logs" description="Update the featured decision logs displayed on the homepage." actions={[{ label: "Manage Logs →", onClick: () => setActiveTab("judgment") }]} />
                 <DashboardCard icon={<BookOpen size={20} color="#EC4899" />} iconBg="#FDF2F8" title="Principles" description="Manage the principles derived from decision logs and page content." actions={[{ label: "Manage Principles →", onClick: () => setActiveTab("principles") }]} />
                 <DashboardCard icon={<Grid size={20} color="#6366F1" />} iconBg="#EEF2FF" title="Leverage Page" description="Manage alliances, partnerships, and the specialist network." actions={[{ label: "Manage Leverage →", onClick: () => setActiveTab("leverage") }]} />
@@ -186,6 +189,7 @@ export default function AdminPage() {
 
           {/* ── Section Editors ── */}
           {activeTab === "hero"           && <HeroEditor site={activeSite} />}
+          {activeTab === "home_sections"  && <HomeSectionsEditor site={activeSite} />}
           {activeTab === "trust"          && <TrustEditor site={activeSite} />}
           {activeTab === "judgment"       && <JudgmentEditor site={activeSite} />}
           {activeTab === "judgment_slugs" && <JudgmentSlugsEditor site={activeSite} />}

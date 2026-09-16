@@ -7,7 +7,7 @@ export const revalidate = 0;
 export default async function Home() {
   let content: any = {
     eyebrow: "FLOWTARIS",
-    heroTitle: "WE DON'T JUST\nDELIVER SYSTEMS.\nWE MAKE THE\nDECISIONS BEHIND THEM\nVISIBLE.",
+    heroTitle: "WE DON'T JUST\\nDELIVER SYSTEMS.\\nWE MAKE THE\\nDECISIONS BEHIND THEM\\nVISIBLE.",
     heroSubtitle: "Engineering complex systems for companies where reliability, judgment, and execution matter.",
     heroImage: "/hero_image.png",
     ctaText: "EXPLORE OUR JUDGMENT \u2192",
@@ -23,22 +23,60 @@ export default async function Home() {
     ]
   };
 
+  let homeSections: any = {
+    latestJudgment: {
+      title: "LATEST JUDGMENT",
+      viewAllText: "VIEW ALL \u2192",
+      viewAllLink: "/judgment",
+      date: "MAR 15, 2026",
+      tags: "CEO \u00B7 STRATEGY \u00B7 PRICING",
+      headline: "WHY WE MOVED FROM\\nT&M TO OUTCOME-BASED PRICING",
+      description: "Clients wanted certainty. We wanted alignment. Here's the decision we made \u2014 and what happened next.",
+      quote: '"Price for the outcome, not the hour."',
+      ctaText: "READ DECISION \u2192",
+      ctaLink: "/judgment/pricing"
+    },
+    featuredLogs: [
+      { id: "1", date: "FEB 03, 2026", tags: "CTO \u00B7 TECH \u00B7 CRISIS", title: "THE NETSUITE API CRISIS", ctaText: "READ \u2192", ctaLink: "/judgment/netsuite" },
+      { id: "2", date: "JAN 10, 2026", tags: "COO \u00B7 HIRING \u00B7 CULTURE", title: "WHY WE HIRED A PRINCIPAL\\nBEFORE WE NEEDED ONE", ctaText: "READ \u2192", ctaLink: "/judgment/hiring" }
+    ],
+    whatWeBelieve: {
+      label: "WHAT WE BELIEVE",
+      quote: '"Revenue that costs your culture\\nis expensive revenue."',
+      attribution: "\u2014 Decision Log",
+      ctaText: "EXPLORE ALL PRINCIPLES \u2192",
+      ctaLink: "/principles"
+    },
+    trustStatement: {
+      headline: "WE WRITE DOWN THE DECISIONS.",
+      subheadline: "Not because transparency sounds good.\\nBecause decisions are where the work actually happens.",
+      body: "Every Decision Log records the context,\\nthe choice, the alternatives rejected,\\nand the outcome."
+    },
+    finalCta: {
+      headline: "HAVE A COMPLEX PROBLEM?",
+      subheadline: "Start with how we think.",
+      primaryText: "READ OUR JUDGMENT \u2192",
+      primaryLink: "#judgment",
+      secondaryText: "TALK TO FLOWTARIS \u2192",
+      secondaryLink: "/contact"
+    }
+  };
+
   try {
     if (supabase) {
-    const { data: contentData } = await supabase.from('page_content').select('content').eq('id', 'home').single();
-    if (contentData?.content) {
-      content = contentData.content;
-    }
-    
-    const { data: trustData } = await supabase.from('page_content').select('content').eq('id', 'systems_of_trust').single();
-    if (trustData?.content) {
-      trustContent = trustData.content;
-    }
-    
-    const { data: pdfData } = await supabase.from('pdf_documents').select('*').order('created_at', { ascending: false });
-    if (pdfData) {
-      pdfs = pdfData;
-    }
+      const { data: contentData } = await supabase.from('page_content').select('content').eq('id', 'home').single();
+      if (contentData?.content) content = contentData.content;
+      
+      const { data: trustData } = await supabase.from('page_content').select('content').eq('id', 'systems_of_trust').single();
+      if (trustData?.content) trustContent = trustData.content;
+      
+      const { data: homeSectionsData } = await supabase.from('page_content').select('content').eq('id', 'home_sections').single();
+      if (homeSectionsData?.content) {
+        homeSections = { ...homeSections, ...homeSectionsData.content };
+      }
+      
+      const { data: pdfData } = await supabase.from('pdf_documents').select('*').order('created_at', { ascending: false });
+      if (pdfData) pdfs = pdfData;
     }
   } catch (err) {
     console.error("Supabase fetch failed", err);
@@ -72,6 +110,85 @@ export default async function Home() {
           <Image src={content.heroImage || "/hero_image.png"} alt="Flowtaris Modern Architecture" className="hero-image" width={800} height={600} priority />
         </div>
       </section>
+
+      {/* --- MOVED SECTIONS START HERE --- */}
+
+      {/* 7. LATEST JUDGMENT */}
+      <section className="section latest-judgment" id="judgment">
+        <div className="section-header">
+          <h2 className="section-title section-heading">{homeSections.latestJudgment.title}</h2>
+          <a href={homeSections.latestJudgment.viewAllLink} className="view-all">{homeSections.latestJudgment.viewAllText}</a>
+        </div>
+        <hr className="divider" />
+        
+        <div className="featured-judgment">
+          <div className="judgment-meta">
+            <span className="judgment-date">{homeSections.latestJudgment.date}</span>
+            <span className="judgment-tags">{homeSections.latestJudgment.tags}</span>
+          </div>
+          <h3 className="judgment-title section-heading">
+            {formatText(homeSections.latestJudgment.headline)}
+          </h3>
+          <p className="judgment-desc card-description">
+            {formatText(homeSections.latestJudgment.description)}
+          </p>
+          <div className="judgment-principle">
+            {homeSections.latestJudgment.quote}
+          </div>
+          <a href={homeSections.latestJudgment.ctaLink} className="judgment-cta">{homeSections.latestJudgment.ctaText}</a>
+        </div>
+      </section>
+
+      {/* 8. FEATURED DECISION LOGS */}
+      <section className="section decision-logs">
+        <div className="logs-grid">
+          {(homeSections.featuredLogs || []).map((log: any, idx: number) => (
+            <div key={log.id || idx} className="log-entry">
+              <div className="judgment-meta">
+                <span className="judgment-date">{log.date}</span>
+                <span className="judgment-tags">{log.tags}</span>
+              </div>
+              <h4 className="log-title card-heading">
+                {formatText(log.title)}
+              </h4>
+              <a href={log.ctaLink} className="log-cta">{log.ctaText}</a>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 9. WHAT WE BELIEVE */}
+      <section className="section what-we-believe" id="principles">
+        <span className="section-label">{homeSections.whatWeBelieve.label}</span>
+        <blockquote className="belief-statement section-heading">
+          {formatText(homeSections.whatWeBelieve.quote)}
+        </blockquote>
+        <div className="belief-attribution">{homeSections.whatWeBelieve.attribution}</div>
+        <a href={homeSections.whatWeBelieve.ctaLink} className="belief-cta">{homeSections.whatWeBelieve.ctaText}</a>
+      </section>
+
+      {/* 10. TRUST STATEMENT */}
+      <section className="section trust-statement">
+        <h2 className="trust-headline section-heading">{homeSections.trustStatement.headline}</h2>
+        <p className="trust-subheadline card-description">
+          {formatText(homeSections.trustStatement.subheadline)}
+        </p>
+        <p className="trust-body card-description">
+          {formatText(homeSections.trustStatement.body)}
+        </p>
+      </section>
+
+      {/* 11. FINAL CTA */}
+      <section className="section final-cta" id="contact">
+        <h2 className="cta-headline section-heading">{homeSections.finalCta.headline}</h2>
+        <p className="cta-subheadline card-description">{homeSections.finalCta.subheadline}</p>
+        <div className="cta-buttons">
+          <a href={homeSections.finalCta.primaryLink} className="cta-button primary">{homeSections.finalCta.primaryText}</a>
+          <a href={homeSections.finalCta.secondaryLink} className="cta-button secondary">{homeSections.finalCta.secondaryText}</a>
+        </div>
+      </section>
+      
+      {/* --- MOVED SECTIONS END HERE --- */}
 
       {/* PDF SECTION */}
       {pdfs.length > 0 && (
@@ -110,94 +227,6 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 7. LATEST JUDGMENT */}
-      <section className="section latest-judgment" id="judgment">
-        <div className="section-header">
-          <h2 className="section-title section-heading">LATEST JUDGMENT</h2>
-          <a href="/judgment" className="view-all">VIEW ALL &rarr;</a>
-        </div>
-        <hr className="divider" />
-        
-        <div className="featured-judgment">
-          <div className="judgment-meta">
-            <span className="judgment-date">MAR 15, 2026</span>
-            <span className="judgment-tags">CEO &middot; STRATEGY &middot; PRICING</span>
-          </div>
-          <h3 className="judgment-title section-heading">
-            WHY WE MOVED FROM<br />
-            T&M TO OUTCOME-BASED PRICING
-          </h3>
-          <p className="judgment-desc card-description">
-            Clients wanted certainty. We wanted alignment. Here&apos;s the decision we made &mdash; and what happened next.
-          </p>
-          <div className="judgment-principle">
-            &quot;Price for the outcome, not the hour.&quot;
-          </div>
-          <a href="/judgment/pricing" className="judgment-cta">READ DECISION &rarr;</a>
-        </div>
-      </section>
-
-      {/* 8. FEATURED DECISION LOGS */}
-      <section className="section decision-logs">
-        <div className="logs-grid">
-          <div className="log-entry">
-            <div className="judgment-meta">
-              <span className="judgment-date">FEB 03, 2026</span>
-              <span className="judgment-tags">CTO &middot; TECH &middot; CRISIS</span>
-            </div>
-            <h4 className="log-title card-heading">THE NETSUITE API CRISIS</h4>
-            <a href="/judgment/netsuite" className="log-cta">READ &rarr;</a>
-          </div>
-          <div className="log-entry">
-            <div className="judgment-meta">
-              <span className="judgment-date">JAN 10, 2026</span>
-              <span className="judgment-tags">COO &middot; HIRING &middot; CULTURE</span>
-            </div>
-            <h4 className="log-title card-heading">WHY WE HIRED A PRINCIPAL<br />BEFORE WE NEEDED ONE</h4>
-            <a href="/judgment/hiring" className="log-cta">READ &rarr;</a>
-          </div>
-        </div>
-      </section>
-
-      {/* 9. WHAT WE BELIEVE */}
-      <section className="section what-we-believe" id="principles">
-        <span className="section-label">WHAT WE BELIEVE</span>
-        <blockquote className="belief-statement section-heading">
-          &quot;Revenue that costs your culture<br />
-          is expensive revenue.&quot;
-        </blockquote>
-        <div className="belief-attribution">&mdash; Decision Log</div>
-        <a href="/principles" className="belief-cta">EXPLORE ALL PRINCIPLES &rarr;</a>
-      </section>
-
-      {/* 10. TRUST STATEMENT */}
-      <section className="section trust-statement">
-        <h2 className="trust-headline section-heading">WE WRITE DOWN THE DECISIONS.</h2>
-        <p className="trust-subheadline card-description">
-          Not because transparency sounds good.<br />
-          Because decisions are where the work actually happens.
-        </p>
-        <p className="trust-body card-description">
-          Every Decision Log records the context,<br />
-          the choice, the alternatives rejected,<br />
-          and the outcome.
-        </p>
-      </section>
-
-      {/* 11. FINAL CTA */}
-      <section className="section final-cta" id="contact">
-        <h2 className="cta-headline section-heading">HAVE A COMPLEX PROBLEM?</h2>
-        <p className="cta-subheadline card-description">Start with how we think.</p>
-        <div className="cta-buttons">
-          <a href="#judgment" className="cta-button primary">READ OUR JUDGMENT &rarr;</a>
-          <a href="/contact" className="cta-button secondary">TALK TO FLOWTARIS &rarr;</a>
-        </div>
-      </section>
     </>
   );
 }
-
-
-<div id="VERCEL-LIVE-TEST-12345" style={{display: 'none'}}></div>
-
-
