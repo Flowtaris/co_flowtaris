@@ -8,6 +8,7 @@ export default function JudgmentPage() {
   const [activeTag, setActiveTag] = useState("ALL");
   const [activeAuthor, setActiveAuthor] = useState("AUTHOR / ALL");
   const [activeYear, setActiveYear] = useState("YEAR / 2026");
+  const [visibleCount, setVisibleCount] = useState(10);
   
   const [decisionLogs, setDecisionLogs] = useState<any[]>([]);
   const [judgmentContent, setJudgmentContent] = useState<any>({
@@ -84,6 +85,8 @@ export default function JudgmentPage() {
     return matchesSearch && matchesTag && matchesAuthor && matchesYear;
   });
 
+  const displayedLogs = filteredLogs.slice(0, visibleCount);
+
   return (
     <>
       {/* 1. Page Introduction */}
@@ -97,7 +100,7 @@ export default function JudgmentPage() {
           {formatText(judgmentContent.description)}
         </div>
         <div className="judgment-meta" style={{ width: "100%", justifyContent: "space-between", borderTop: "1px solid var(--color-structural)", paddingTop: "24px", marginBottom: 0 }}>
-          <span>{decisionLogs.length < 10 ? `0${decisionLogs.length}` : decisionLogs.length} LOGS</span>
+          <span>{filteredLogs.length < 10 ? `0${filteredLogs.length}` : filteredLogs.length} LOGS</span>
           <span>2026</span>
         </div>
       </section>
@@ -111,7 +114,10 @@ export default function JudgmentPage() {
               className="filter-search"
               placeholder="Search decisions..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setVisibleCount(10);
+              }}
               aria-label="Search decisions"
             />
           </div>
@@ -122,7 +128,10 @@ export default function JudgmentPage() {
                 <button
                   key={tag}
                   className={`filter-tag ${activeTag === tag ? "active" : ""}`}
-                  onClick={() => setActiveTag(tag)}
+                  onClick={() => {
+                    setActiveTag(tag);
+                    setVisibleCount(10);
+                  }}
                   aria-pressed={activeTag === tag}
                 >
                   {tag}
@@ -134,7 +143,10 @@ export default function JudgmentPage() {
               <select 
                 className="filter-select"
                 value={activeAuthor}
-                onChange={(e) => setActiveAuthor(e.target.value)}
+                onChange={(e) => {
+                  setActiveAuthor(e.target.value);
+                  setVisibleCount(10);
+                }}
                 aria-label="Filter by author"
               >
                 {availableAuthors.map(author => (
@@ -145,7 +157,10 @@ export default function JudgmentPage() {
               <select 
                 className="filter-select"
                 value={activeYear}
-                onChange={(e) => setActiveYear(e.target.value)}
+                onChange={(e) => {
+                  setActiveYear(e.target.value);
+                  setVisibleCount(10);
+                }}
                 aria-label="Filter by year"
               >
                 {availableYears.map(year => (
@@ -165,7 +180,7 @@ export default function JudgmentPage() {
         </div>
         
         <div className="decision-archive">
-          {filteredLogs.map((log, index) => (
+          {displayedLogs.map((log, index) => (
             <div key={log.id} className={`decision-record ${index === 0 ? "featured" : ""}`}>
               <div className="judgment-meta">
                 <span>{log.date}</span>
@@ -192,6 +207,7 @@ export default function JudgmentPage() {
                   setActiveTag("ALL");
                   setActiveAuthor("AUTHOR / ALL");
                   setActiveYear("YEAR / 2026");
+                  setVisibleCount(10);
                 }}
               >
                 CLEAR FILTERS
@@ -206,9 +222,9 @@ export default function JudgmentPage() {
         </div>
         
         {/* Load More */}
-        {filteredLogs.length > 0 && (
+        {visibleCount < filteredLogs.length && (
           <div className="load-more-section">
-            <button className="load-more-btn" onClick={() => console.log("Load more requested")}>
+            <button className="load-more-btn" onClick={() => setVisibleCount(prev => prev + 10)}>
               LOAD 10 MORE <span className="arrow">&darr;</span>
             </button>
           </div>
