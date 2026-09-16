@@ -40,10 +40,7 @@ export default function JudgmentEditor({ site }: { site: string }) {
   const [saveStatus, setSaveStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   useEffect(() => {
-    if (saveStatus) {
-      const timer = setTimeout(() => setSaveStatus(null), 4000);
-      return () => clearTimeout(timer);
-    }
+    if (saveStatus) { const timer = setTimeout(() => setSaveStatus(null), 4000); return () => clearTimeout(timer); } return undefined;
   }, [saveStatus]);
 
   async function saveJudgmentContent() {

@@ -12,6 +12,8 @@ import PrinciplesEditor from "./PrinciplesEditor";
 import LeverageEditor from "./LeverageEditor";
 import ResourcesEditor from "./ResourcesEditor";
 import WorkdayEditor from "./WorkdayEditor";
+import NetsuiteEditor from "./NetsuiteEditor";
+import CoupaEditor from "./CoupaEditor";
 import FooterEditor from "./FooterEditor";
 import EvidenceEditor from "./EvidenceEditor";
 import ContactEditor from "./ContactEditor";
@@ -50,7 +52,9 @@ const sidebarLinks = [
   { id: "questionnaire", label: "Questionnaire Center", icon: <FileBox size={18} /> },
   { id: "contact", label: "Contact Page", icon: <MessageSquare size={18} /> },
   { id: "resources", label: "PDF Resources", icon: <FileBox size={18} /> },
-  { id: "workday", label: "Workday Specialists", icon: <Briefcase size={18} /> },
+  { id: "netsuite", label: "NetSuite Alliance", icon: <Briefcase size={18} /> },
+  { id: "coupa", label: "Coupa Alliance", icon: <Briefcase size={18} /> },
+  { id: "workday", label: "Workday Alliance", icon: <Briefcase size={18} /> },
   { id: "footer", label: "Global Footer", icon: <LayoutDashboard size={18} /> },
 ];
 
@@ -180,6 +184,9 @@ export default function AdminPage() {
                 <DashboardCard icon={<ShieldCheck size={20} color="#10B981" />} iconBg="#ECFDF5" title="Evidence Page" description="Manage evidence documents, questionnaires, and policies." actions={[{ label: "Manage Evidence →", onClick: () => setActiveTab("evidence") }]} />
                 <DashboardCard icon={<FileBox size={20} color="#0EA5E9" />} iconBg="#F0F9FF" title="Questionnaire Center" description="Manage pre-filled security and compliance questionnaires." actions={[{ label: "Manage Questionnaires →", onClick: () => setActiveTab("questionnaire") }]} />
                 <DashboardCard icon={<MessageSquare size={20} color="#3B82F6" />} iconBg="#EFF6FF" title="Contact Page" description="Manage contact routing blocks, addresses, and corporate info." actions={[{ label: "Manage Contact →", onClick: () => setActiveTab("contact") }]} />
+                <DashboardCard icon={<Briefcase size={20} color="#6366F1" />} iconBg="#EEF2FF" title="NetSuite Alliance" description="Manage the NetSuite strategic alliance page content." actions={[{ label: "Manage NetSuite →", onClick: () => setActiveTab("netsuite") }]} />
+                <DashboardCard icon={<Briefcase size={20} color="#6366F1" />} iconBg="#EEF2FF" title="Coupa Alliance" description="Manage the Coupa strategic alliance page content." actions={[{ label: "Manage Coupa →", onClick: () => setActiveTab("coupa") }]} />
+                <DashboardCard icon={<Briefcase size={20} color="#6366F1" />} iconBg="#EEF2FF" title="Workday Alliance" description="Manage the Workday strategic alliance page content and specialists." actions={[{ label: "Manage Workday →", onClick: () => setActiveTab("workday") }]} />
                 <DashboardCard icon={<LayoutDashboard size={20} color="#059669" />} iconBg="#D1FAE5" title="Global Footer" description="Manage the footer logo, links, and copyright text." actions={[{ label: "Manage Footer →", onClick: () => setActiveTab("footer") }]} />
               </div>
             </div>
@@ -198,6 +205,8 @@ export default function AdminPage() {
           {activeTab === "questionnaire"  && <QuestionnaireEditor site={activeSite} />}
           {activeTab === "contact"        && <ContactEditor site={activeSite} />}
           {activeTab === "resources"      && <ResourcesEditor site={activeSite} />}
+          {activeTab === "netsuite"       && <NetsuiteEditor site={activeSite} />}
+          {activeTab === "coupa"          && <CoupaEditor site={activeSite} />}
           {activeTab === "workday"        && <WorkdayEditor site={activeSite} />}
           {activeTab === "footer"         && <FooterEditor site={activeSite} />}
 

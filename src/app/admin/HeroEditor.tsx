@@ -71,10 +71,7 @@ export default function HeroEditor({ site }: { site: string }) {
 
   // Clear save status after 4 seconds
   useEffect(() => {
-    if (saveStatus) {
-      const timer = setTimeout(() => setSaveStatus(null), 4000);
-      return () => clearTimeout(timer);
-    }
+    if (saveStatus) { const timer = setTimeout(() => setSaveStatus(null), 4000); return () => clearTimeout(timer); } return undefined;
   }, [saveStatus]);
 
 
@@ -123,6 +120,7 @@ export default function HeroEditor({ site }: { site: string }) {
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
+    if (!file) return;
     setIsUploadingImage(true);
     try {
       const formData = new FormData();
