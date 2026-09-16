@@ -5,9 +5,9 @@ const DEFAULT_DATA = {
   hero: { eyebrow: "EVIDENCE", title: "HOW WE OPERATE.", subtitle: "The documents behind the claims.\nSecurity. Governance. Operations.", body: "Everything procurement needs to understand before the conversation starts.", stats: ["10+ DOCUMENTS", "03 CATEGORIES"] },
   categories: ["SECURITY", "LEGAL", "OPERATIONS", "QUESTIONNAIRE"],
   panels: [
-    { id: "security", num: "01", title: "SECURITY", desc: "The controls, policies and practices that protect\nclient systems and information.", docs: ["SOC 2", "INFORMATION SECURITY POLICY", "INCIDENT RESPONSE", "BUSINESS CONTINUITY"], cta: "EXPLORE SECURITY →" },
-    { id: "legal", num: "02", title: "LEGAL", desc: "The agreements, policies and governance material\nbehind our commercial relationships.", docs: ["MSA", "DPA", "SUBPROCESSORS", "INSURANCE"], cta: "EXPLORE LEGAL →" },
-    { id: "operations", num: "03", title: "OPERATIONS", desc: "How we deliver, support and recover\nwhen things don't go according to plan.", docs: ["SLA", "RTO / RPO", "CHANGE MANAGEMENT", "ESCALATION"], cta: "EXPLORE OPERATIONS →" }
+    { id: "security", num: "01", title: "SECURITY", desc: "The controls, policies and practices that protect\nclient systems and information.", docs: ["SOC 2", "INFORMATION SECURITY POLICY", "INCIDENT RESPONSE", "BUSINESS CONTINUITY"], cta: "EXPLORE SECURITY →", href: "#library" },
+    { id: "legal", num: "02", title: "LEGAL", desc: "The agreements, policies and governance material\nbehind our commercial relationships.", docs: ["MSA", "DPA", "SUBPROCESSORS", "INSURANCE"], cta: "EXPLORE LEGAL →", href: "#library" },
+    { id: "operations", num: "03", title: "OPERATIONS", desc: "How we deliver, support and recover\nwhen things don't go according to plan.", docs: ["SLA", "RTO / RPO", "CHANGE MANAGEMENT", "ESCALATION"], cta: "EXPLORE OPERATIONS →", href: "#library" }
   ],
   library: { title: "DOCUMENT LIBRARY", colDocument: "DOCUMENT", colType: "TYPE", colUpdated: "UPDATED", colAction: "ACTION", documents: [
     { name: "SOC 2 REPORT", type: "PDF", updated: "MAR 2026", category: "SECURITY", url: "#", cta: "DOWNLOAD →" },

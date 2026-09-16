@@ -6,9 +6,9 @@ const DEFAULT_DATA = {
   hero: { eyebrow: "EVIDENCE", title: "HOW WE OPERATE.", subtitle: "The documents behind the claims.\nSecurity. Governance. Operations.", body: "Everything procurement needs to understand before the conversation starts.", stats: ["10+ DOCUMENTS", "03 CATEGORIES"] },
   categories: ["SECURITY", "LEGAL", "OPERATIONS", "QUESTIONNAIRE"],
   panels: [
-    { id: "security", num: "01", title: "SECURITY", desc: "The controls, policies and practices that protect\nclient systems and information.", docs: ["SOC 2", "INFORMATION SECURITY POLICY", "INCIDENT RESPONSE", "BUSINESS CONTINUITY"], cta: "EXPLORE SECURITY →" },
-    { id: "legal", num: "02", title: "LEGAL", desc: "The agreements, policies and governance material\nbehind our commercial relationships.", docs: ["MSA", "DPA", "SUBPROCESSORS", "INSURANCE"], cta: "EXPLORE LEGAL →" },
-    { id: "operations", num: "03", title: "OPERATIONS", desc: "How we deliver, support and recover\nwhen things don't go according to plan.", docs: ["SLA", "RTO / RPO", "CHANGE MANAGEMENT", "ESCALATION"], cta: "EXPLORE OPERATIONS →" }
+    { id: "security", num: "01", title: "SECURITY", desc: "The controls, policies and practices that protect\nclient systems and information.", docs: ["SOC 2", "INFORMATION SECURITY POLICY", "INCIDENT RESPONSE", "BUSINESS CONTINUITY"], cta: "EXPLORE SECURITY →", href: "#library" },
+    { id: "legal", num: "02", title: "LEGAL", desc: "The agreements, policies and governance material\nbehind our commercial relationships.", docs: ["MSA", "DPA", "SUBPROCESSORS", "INSURANCE"], cta: "EXPLORE LEGAL →", href: "#library" },
+    { id: "operations", num: "03", title: "OPERATIONS", desc: "How we deliver, support and recover\nwhen things don't go according to plan.", docs: ["SLA", "RTO / RPO", "CHANGE MANAGEMENT", "ESCALATION"], cta: "EXPLORE OPERATIONS →", href: "#library" }
   ],
   library: { title: "DOCUMENT LIBRARY", colDocument: "DOCUMENT", colType: "TYPE", colUpdated: "UPDATED", colAction: "ACTION", documents: [
     { name: "SOC 2 REPORT", type: "PDF", updated: "MAR 2026", category: "SECURITY", url: "#", cta: "DOWNLOAD →" },
@@ -138,11 +138,12 @@ export default function EvidenceEditor({ site }: { site: string }) {
               <textarea value={panel.desc || ""} onChange={e => { const arr = [...data.panels]; arr[i].desc = e.target.value; updateRoot("panels", arr); }} placeholder="Description" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, height: 60 }} />
               <input value={(panel.docs || []).join(", ")} onChange={e => { const arr = [...data.panels]; arr[i].docs = e.target.value.split(",").map((s:string) => s.trim()); updateRoot("panels", arr); }} placeholder="Documents (comma separated)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
               <input value={panel.cta || ""} onChange={e => { const arr = [...data.panels]; arr[i].cta = e.target.value; updateRoot("panels", arr); }} placeholder="CTA Text" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
+              <input value={panel.href || ""} onChange={e => { const arr = [...data.panels]; arr[i].href = e.target.value; updateRoot("panels", arr); }} placeholder="CTA URL (e.g. #library or /evidence/security)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
             </div>
             <button onClick={() => { const arr = [...data.panels]; arr.splice(i, 1); updateRoot("panels", arr); }} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 12px", border: "none", borderRadius: 6, cursor: "pointer", alignSelf: "flex-start" }}>✕</button>
           </div>
         ))}
-        <button onClick={() => { const arr = [...(data.panels || []), { id: "", num: "", title: "", desc: "", docs: [], cta: "" }]; updateRoot("panels", arr); }} style={{ background: "#E5E7EB", padding: "8px 16px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500 }}>+ Add Panel</button>
+        <button onClick={() => { const arr = [...(data.panels || []), { id: "", num: "", title: "", desc: "", docs: [], cta: "", href: "" }]; updateRoot("panels", arr); }} style={{ background: "#E5E7EB", padding: "8px 16px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500 }}>+ Add Panel</button>
       </div>
 
       {/* Document Library */}

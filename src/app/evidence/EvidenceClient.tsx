@@ -53,9 +53,15 @@ export default function EvidenceClient({ data }: { data: any }) {
                 <span key={j}>{doc}</span>
               ))}
             </div>
-            <button onClick={() => scrollTo("library")} className="judgment-cta" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-              {panel.cta}
-            </button>
+            {panel.href ? (
+              <Link href={panel.href} className="judgment-cta" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                {panel.cta}
+              </Link>
+            ) : (
+              <button onClick={() => scrollTo("library")} className="judgment-cta" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                {panel.cta}
+              </button>
+            )}
           </div>
         ))}
       </section>
