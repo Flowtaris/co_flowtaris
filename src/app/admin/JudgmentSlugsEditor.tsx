@@ -75,8 +75,34 @@ export default function JudgmentSlugsEditor({ site }: { site: string }) {
     });
   };
 
+  const removeAlternative = (index: number) => {
+    setSlugData((prev: any) => {
+      const newAlts = [...(prev.alternativesRejected || [])];
+      newAlts.splice(index, 1);
+      return { ...prev, alternativesRejected: newAlts };
+    });
+  };
+
+  const removeMetric = (index: number) => {
+    setSlugData((prev: any) => {
+      const newMetrics = [...(prev.outcome?.metrics || [])];
+      newMetrics.splice(index, 1);
+      return { ...prev, outcome: { ...prev.outcome, metrics: newMetrics } };
+    });
+  };
+
+  const [saveStatus, setSaveStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  useEffect(() => {
+    if (saveStatus) {
+      const timer = setTimeout(() => setSaveStatus(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [saveStatus]);
+
   async function saveSlugContent() {
     if (!selectedSlug || !slugData) return;
+    setSaveStatus(null);
     try {
       const res = await fetch(`/api/content/${site}`, {
         method: "POST",
@@ -86,10 +112,15 @@ export default function JudgmentSlugsEditor({ site }: { site: string }) {
           record: { id: `judgment_slug_${selectedSlug}`, content: slugData, updated_at: new Date().toISOString() }
         })
       });
+      if (!res.ok) {
+        throw new Error(`HTTP Error ${res.status}`);
+      }
       const { error } = await res.json();
       if (error) throw new Error(error);
-      alert(`Slug content saved successfully to flowtaris.${site}!`);
-    } catch (e: any) { alert("Error saving: " + e.message); }
+      setSaveStatus({ type: "success", message: `Slug content saved successfully to flowtaris.${site}!` });
+    } catch (e: any) { 
+      setSaveStatus({ type: "error", message: "Error saving: " + e.message }); 
+    }
   }
 
   if (loading) return <div>Loading...</div>;
@@ -97,6 +128,23 @@ export default function JudgmentSlugsEditor({ site }: { site: string }) {
   return (
     <div style={{ maxWidth: 900 }}>
       <h1 style={{ fontSize: 24, fontWeight: "bold", color: "#111827", marginBottom: 24 }}>Judgment Slugs Content</h1>
+      
+      {/* Save Status Banner */}
+      {saveStatus && (
+        <div style={{
+          padding: "12px 16px",
+          borderRadius: 8,
+          marginBottom: 20,
+          fontSize: 14,
+          fontWeight: 500,
+          background: saveStatus.type === "success" ? "#ECFDF5" : "#FEF2F2",
+          color: saveStatus.type === "success" ? "#065F46" : "#991B1B",
+          border: `1px solid ${saveStatus.type === "success" ? "#A7F3D0" : "#FECACA"}`,
+        }}>
+          {saveStatus.message}
+        </div>
+      )}
+
       <p style={{ color: "#6B7280", marginBottom: 32, fontSize: 15 }}>Edit the detailed content for individual decision logs here.</p>
 
       <div style={{ background: "#fff", borderRadius: 12, padding: 32, boxShadow: "0 1px 3px rgba(0,0,0,0.05)", border: "1px solid #E5E7EB", marginBottom: 32 }}>
@@ -152,10 +200,11 @@ export default function JudgmentSlugsEditor({ site }: { site: string }) {
                 <div style={{ background: "#F9FAFB", padding: 16, borderRadius: 8 }}>
                   <h3 style={{ fontSize: 16, margin: "0 0 16px 0", fontWeight: 600 }}>Alternatives Rejected</h3>
                   {(slugData.alternativesRejected || []).map((alt: any, idx: number) => (
-                    <div key={idx} style={{ display: "grid", gridTemplateColumns: "60px 1fr 2fr", gap: 8, marginBottom: 8 }}>
+                    <div key={idx} style={{ display: "grid", gridTemplateColumns: "60px 1fr 2fr auto", gap: 8, marginBottom: 8, alignItems: "center" }}>
                       <input placeholder="No." value={alt.number || ""} onChange={(e) => updateAlternative(idx, "number", e.target.value)} style={{ width: "100%", padding: "8px", borderRadius: 6, border: "1px solid #D1D5DB" }} />
                       <input placeholder="Title" value={alt.title || ""} onChange={(e) => updateAlternative(idx, "title", e.target.value)} style={{ width: "100%", padding: "8px", borderRadius: 6, border: "1px solid #D1D5DB" }} />
                       <input placeholder="Reason" value={alt.reason || ""} onChange={(e) => updateAlternative(idx, "reason", e.target.value)} style={{ width: "100%", padding: "8px", borderRadius: 6, border: "1px solid #D1D5DB" }} />
+                      <button onClick={() => removeAlternative(idx)} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 12px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500 }} title="Remove Alternative">✕</button>
                     </div>
                   ))}
                   <button onClick={() => setSlugData((prev: any) => ({ ...prev, alternativesRejected: [...(prev.alternativesRejected || []), { number: "", title: "", reason: "" }] }))} style={{ padding: "6px 12px", background: "#E5E7EB", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12, marginTop: 8 }}>+ Add Alternative</button>
@@ -168,9 +217,10 @@ export default function JudgmentSlugsEditor({ site }: { site: string }) {
                   <div style={{ marginBottom: 12 }}>
                     <label style={{ display: "block", marginBottom: 8, fontSize: 14 }}>Metrics</label>
                     {(slugData.outcome?.metrics || []).map((metric: any, idx: number) => (
-                      <div key={idx} style={{ display: "grid", gridTemplateColumns: "100px 1fr", gap: 8, marginBottom: 8 }}>
+                      <div key={idx} style={{ display: "grid", gridTemplateColumns: "100px 1fr auto", gap: 8, marginBottom: 8, alignItems: "center" }}>
                         <input placeholder="Value" value={metric.value || ""} onChange={(e) => updateMetric(idx, "value", e.target.value)} style={{ width: "100%", padding: "8px", borderRadius: 6, border: "1px solid #D1D5DB" }} />
                         <input placeholder="Label" value={metric.label || ""} onChange={(e) => updateMetric(idx, "label", e.target.value)} style={{ width: "100%", padding: "8px", borderRadius: 6, border: "1px solid #D1D5DB" }} />
+                        <button onClick={() => removeMetric(idx)} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 12px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500 }} title="Remove Metric">✕</button>
                       </div>
                     ))}
                     <button onClick={() => setSlugData((prev: any) => ({ ...prev, outcome: { ...prev.outcome, metrics: [...(prev.outcome?.metrics || []), { value: "", label: "" }] } }))} style={{ padding: "6px 12px", background: "#E5E7EB", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12, marginTop: 8 }}>+ Add Metric</button>

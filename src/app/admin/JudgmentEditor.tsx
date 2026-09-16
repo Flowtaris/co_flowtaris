@@ -37,7 +37,17 @@ export default function JudgmentEditor({ site }: { site: string }) {
     fetchData();
   }, [site]);
 
+  const [saveStatus, setSaveStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  useEffect(() => {
+    if (saveStatus) {
+      const timer = setTimeout(() => setSaveStatus(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [saveStatus]);
+
   async function saveJudgmentContent() {
+    setSaveStatus(null);
     try {
       const res = await fetch(`/api/content/${site}`, {
         method: "POST",
@@ -47,15 +57,19 @@ export default function JudgmentEditor({ site }: { site: string }) {
           record: { id: "judgment", content: { title: judgmentTitle, subtitle: judgmentSubtitle, description: judgmentDescription, logs: decisionLogs }, updated_at: new Date().toISOString() }
         })
       });
+      if (!res.ok) {
+        throw new Error(`HTTP Error ${res.status}`);
+      }
       const { error } = await res.json();
-      if (error) alert("Error saving: " + error);
-      else alert(`Judgment content saved to flowtaris.${site}!`);
-    } catch (err) {
-      alert("Network error while saving.");
+      if (error) setSaveStatus({ type: "error", message: "Error saving: " + error });
+      else setSaveStatus({ type: "success", message: `Judgment content saved to flowtaris.${site}!` });
+    } catch (err: any) {
+      setSaveStatus({ type: "error", message: err.message || "Network error while saving." });
     }
   }
 
   async function saveDecisionLogs(updatedLogs: any[]) {
+    setSaveStatus(null);
     try {
       const res = await fetch(`/api/content/${site}`, {
         method: "POST",
@@ -65,11 +79,17 @@ export default function JudgmentEditor({ site }: { site: string }) {
           record: { id: "judgment", content: { title: judgmentTitle, subtitle: judgmentSubtitle, description: judgmentDescription, logs: updatedLogs }, updated_at: new Date().toISOString() }
         })
       });
+      if (!res.ok) {
+        throw new Error(`HTTP Error ${res.status}`);
+      }
       const { error } = await res.json();
-      if (error) alert("Error saving logs: " + error);
-      else setDecisionLogs(updatedLogs);
-    } catch (err) {
-      alert("Network error while saving.");
+      if (error) setSaveStatus({ type: "error", message: "Error saving logs: " + error });
+      else {
+        setDecisionLogs(updatedLogs);
+        setSaveStatus({ type: "success", message: `Changes are saved to flowtaris.${site}!` });
+      }
+    } catch (err: any) {
+      setSaveStatus({ type: "error", message: err.message || "Network error while saving." });
     }
   }
 
@@ -106,6 +126,22 @@ export default function JudgmentEditor({ site }: { site: string }) {
     <div style={{ maxWidth: 900 }}>
       <h1 style={{ fontSize: 24, fontWeight: "bold", color: "#111827", marginBottom: 24 }}>Judgment Logs</h1>
       
+      {/* Save Status Banner */}
+      {saveStatus && (
+        <div style={{
+          padding: "12px 16px",
+          borderRadius: 8,
+          marginBottom: 20,
+          fontSize: 14,
+          fontWeight: 500,
+          background: saveStatus.type === "success" ? "#ECFDF5" : "#FEF2F2",
+          color: saveStatus.type === "success" ? "#065F46" : "#991B1B",
+          border: `1px solid ${saveStatus.type === "success" ? "#A7F3D0" : "#FECACA"}`,
+        }}>
+          {saveStatus.message}
+        </div>
+      )}
+
       {/* Hero Content */}
       <div style={{ background: "#fff", borderRadius: 12, padding: 32, boxShadow: "0 1px 3px rgba(0,0,0,0.05)", border: "1px solid #E5E7EB", marginBottom: 32 }}>
         <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>Judgment Page Hero</h2>

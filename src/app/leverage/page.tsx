@@ -13,7 +13,7 @@ export default async function LeveragePage() {
   const data = res?.content || {
     hero: { eyebrow: "LEVERAGE", title: "HOW WE SCALE\nWITHOUT SCALING\nCOMPLEXITY.", subtitle: "The platforms, partnerships and specialist\nrelationships that extend what Flowtaris\ncan deliver.", stats: ["03 STRATEGIC ALLIANCES", "ACTIVE NETWORK"] },
     leverageModel: { title: "HOW WE CREATE LEVERAGE", items: [{ title: "PLATFORMS", desc: "Technology platforms that allow\nus to solve complex problems faster." }, { title: "PARTNERS", desc: "Strategic relationships that expand\ncapability and reach." }, { title: "PEOPLE", desc: "Specialists who bring depth where\ngeneral capability isn't enough." }] },
-    strategicAlliances: { title: "STRATEGIC ALLIANCES", alliances: [{ num: "01", name: "NETSUITE", desc: "ERP implementation, integration and platform engineering.", status: "[ IN DEVELOPMENT ]", href: "/leverage/netsuite" }, { num: "02", name: "COUPA", desc: "Procurement platform engineering, integration and optimization.", status: "[ IN DEVELOPMENT ]", href: "/leverage/coupa" }, { num: "03", name: "WORKDAY", desc: "Enterprise platform integration, engineering and delivery.", status: "[ IN DEVELOPMENT ]", href: "/leverage/workday" }] },
+    strategicAlliances: { title: "STRATEGIC ALLIANCES", alliances: [{ num: "01", name: "NETSUITE", desc: "ERP implementation, integration and platform engineering.", status: "[ IN DEVELOPMENT ]", cta: "EXPLORE NETSUITE →", href: "/leverage/netsuite" }, { num: "02", name: "COUPA", desc: "Procurement platform engineering, integration and optimization.", status: "[ IN DEVELOPMENT ]", cta: "EXPLORE COUPA →", href: "/leverage/coupa" }, { num: "03", name: "WORKDAY", desc: "Enterprise platform integration, engineering and delivery.", status: "[ IN DEVELOPMENT ]", cta: "EXPLORE WORKDAY →", href: "/leverage/workday" }] },
     partnershipsChange: { title: "PARTNERSHIPS SHOULD CHANGE\nTHE OUTCOME.", subtitle: "Not the logo wall.", withoutLeverage: ["Client problem", "Flowtaris capability", "Limited delivery boundary"], withLeverage: ["Client problem", "Flowtaris", "Strategic platform / partner", "Specialist capability", "Larger solution surface"] },
     capabilityMap: { title: "CAPABILITY MAP", capabilities: [{ name: "Architecture", f: "✓", p: "✓", s: "✕" }, { name: "Integration", f: "✓", p: "✓", s: "✕" }, { name: "Platform Engineering", f: "✓", p: "✓", s: "✕" }, { name: "Data Engineering", f: "✓", p: "✕", s: "✓" }, { name: "ERP", f: "✕", p: "✓", s: "✓" }, { name: "Procurement", f: "✕", p: "✓", s: "✓" }, { name: "AI / Automation", f: "✓", p: "✕", s: "✓" }] },
     partnerRegistration: { label: "PARTNER DEAL REGISTRATION", title: "HAVE AN OPPORTUNITY?", desc: "Register it once.\nWe'll route it to the appropriate Flowtaris\nteam and partner relationship.", cta: "REGISTER AN OPPORTUNITY →" },
@@ -67,7 +67,7 @@ export default async function LeveragePage() {
                 <span className="section-label" style={{ margin: 0 }}>PARTNER STATUS</span>
                 <span style={{ fontSize: '1rem', fontWeight: 500, letterSpacing: '0.05em', color: 'var(--color-accent)' }}>{alliance.status}</span>
               </div>
-              <Link href={alliance.href || "#"} className="judgment-cta" style={{ marginTop: '16px', alignSelf: 'flex-start' }}>EXPLORE {alliance.name} &rarr;</Link>
+              <Link href={alliance.href || "#"} className="judgment-cta" style={{ marginTop: '16px', alignSelf: 'flex-start' }}>{alliance.cta || `EXPLORE ${alliance.name} →`}</Link>
             </div>
           ))}
         </div>

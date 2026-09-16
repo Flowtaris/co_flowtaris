@@ -19,28 +19,37 @@ function getClient(site: string) {
 
   const config = SITE_CONFIG[site];
   if (!config?.url || !config?.key) return null;
+  
+  // Ignore dummy credentials used in .env.example
+  if (config.url.includes('xxx.supabase') || config.url.includes('zzz.supabase')) return null;
+
   return createClient(config.url, config.key);
 }
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ site: string }> }) {
-  const { site } = await params;
-  const { searchParams } = new URL(req.url);
-  const table = searchParams.get('table') || 'page_content';
-  const id = searchParams.get('id');
+  try {
+    const { site } = await params;
+    const { searchParams } = new URL(req.url);
+    const table = searchParams.get('table') || 'page_content';
+    const id = searchParams.get('id');
 
-  const client = getClient(site);
-  if (!client) {
-    // If no client is configured, return an empty response so the editor can gracefully load defaults
-    return NextResponse.json({ data: null, message: `Missing credentials for ${site}` }, { status: 200 });
+    const client = getClient(site);
+    if (!client) {
+      // If no client is configured, return an empty response so the editor can gracefully load defaults
+      return NextResponse.json({ data: null, message: `Missing credentials for ${site}` }, { status: 200 });
+    }
+
+    let query = client.from(table).select('*');
+    if (id) query = query.eq('id', id);
+    if (table === 'pdf_documents') query = query.order('created_at', { ascending: false });
+
+    const { data, error } = await query;
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ data });
+  } catch (err: any) {
+    console.error("API GET Error:", err);
+    return NextResponse.json({ error: `Internal API Error: ${err.message}` }, { status: 500 });
   }
-
-  let query = client.from(table).select('*');
-  if (id) query = query.eq('id', id);
-  if (table === 'pdf_documents') query = query.order('created_at', { ascending: false });
-
-  const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ data });
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ site: string }> }) {

@@ -24,11 +24,11 @@ export default function PrinciplesPage() {
         setPageData(pageRes.content);
       } else {
         setPageData({
-          hero: { eyebrow: "PRINCIPLES", title: "WHAT WE BELIEVE\nAFTER MAKING THE\nDECISION.", subtitle: "Principles extracted from the decisions we've actually made." },
+          hero: { eyebrow: "PRINCIPLES", title: "WHAT WE BELIEVE\nAFTER MAKING THE\nDECISION.", subtitle: "Principles extracted from the decisions we've actually made.", stats: ["08 PRINCIPLES", "05 YEARS", "UPDATED AUTOMATICALLY"] },
           intro: { title: "THESE AREN'T BRAND VALUES.", subtitle: "They're conclusions.", body: "Each principle came from a decision:\nsomething we chose,\nsomething we rejected,\nand something we learned." },
           relationship: { steps: [{ label: "DECISION", color: "default" }, { label: "OUTCOME", color: "default" }, { label: "PRINCIPLE", color: "accent" }, { label: "FUTURE DECISIONS", color: "default" }], footer1: "A principle isn't written first.", footer2: "It is earned through a decision." },
-          evolved: { title: "HOW THE PRINCIPLES EVOLVED" },
-          explore: { title: "EXPLORE PRINCIPLES" },
+          evolved: { title: "HOW THE PRINCIPLES EVOLVED", years: ["2019", "2020", "2022", "2023", "2024"] },
+          explore: { title: "EXPLORE PRINCIPLES", categories: ["CRISIS", "CULTURE", "STRATEGY", "TECH"] },
           featured: { label: "FEATURED PRINCIPLE" },
           indexSection: { title: "PRINCIPLES" },
           judgmentConnection: { title: "EVERY PRINCIPLE HAS A HISTORY.", desc: "READ THE DECISIONS\nTHAT CREATED THEM.", cta: "EXPLORE JUDGMENT →" },
@@ -63,17 +63,17 @@ export default function PrinciplesPage() {
         sourceTitle: log.title?.replace(/\n/g, " ") || "",
         sourceSlug: log.slug,
         year: year,
-        outcome: log.outcome?.metrics?.map((m: any) => `${m.value} ${m.label}`).join(" \u00B7 ") || log.outcome?.timeframe || ""
+        outcome: log.outcome?.metrics?.map((m: any) => `${m.value} ${m.label}`).join(" \u00B7 ") || log.outcome?.timeframe || "",
+        isHidden: log.isHidden === true
       };
-    }).filter(p => p.statement !== ""); // remove if no principle
+    }).filter(p => p.statement !== "" && !p.isHidden); // remove if no principle or hidden
   }, [decisionLogs]);
 
   const totalCount = principles.length;
   
   const years = useMemo(() => {
-    const uniqueYears = Array.from(new Set(principles.map(p => p.year))).filter(y => y !== "Unknown").sort();
-    return uniqueYears;
-  }, [principles]);
+    return pageData?.evolved?.years || [];
+  }, [pageData]);
   
   const yearSpan = years.length > 1 ? parseInt(years[years.length - 1]) - parseInt(years[0]) : (years.length === 1 ? 1 : 0);
 
@@ -88,7 +88,14 @@ export default function PrinciplesPage() {
     return matchCat && matchYear;
   });
 
-  const featuredPrinciple = principles[0]; // Just picking the first one as featured
+  const featuredPrinciple = useMemo(() => {
+    if (!principles || principles.length === 0) return null;
+    if (pageData?.featured?.principleSlug) {
+      const found = principles.find(p => p.sourceSlug === pageData.featured.principleSlug);
+      if (found) return found;
+    }
+    return principles[0];
+  }, [principles, pageData]);
 
   if (loading || !pageData) {
     return <div style={{ paddingTop: '120px', padding: '40px' }}>Loading...</div>;
@@ -109,23 +116,13 @@ export default function PrinciplesPage() {
         <p className="card-description ev-subtitle" style={{ maxWidth: '600px', marginBottom: '48px' }} dangerouslySetInnerHTML={{ __html: (pageData.hero.subtitle || "").replace(/\n/g, '<br />') }}></p>
 
         <div style={{ display: 'flex', gap: '48px', flexWrap: 'wrap', borderTop: '1px solid var(--color-structural)', paddingTop: '32px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <span className="trust-body" style={{ fontWeight: 500, letterSpacing: '0.05em' }}>
-              {String(totalCount).padStart(2, '0')} PRINCIPLES
-            </span>
-          </div>
-          {yearSpan > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <span className="trust-body" style={{ fontWeight: 500, letterSpacing: '0.05em' }}>
-                {String(yearSpan).padStart(2, '0')} YEAR{yearSpan > 1 ? 'S' : ''}
+          {(pageData.hero.stats || []).map((stat: string, idx: number, arr: any[]) => (
+            <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <span className="trust-body" style={{ fontWeight: 500, letterSpacing: '0.05em', color: idx === arr.length - 1 ? 'var(--color-accent)' : 'inherit' }}>
+                {stat}
               </span>
             </div>
-          )}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <span className="trust-body" style={{ fontWeight: 500, letterSpacing: '0.05em', color: 'var(--color-accent)' }}>
-              UPDATED AUTOMATICALLY
-            </span>
-          </div>
+          ))}
         </div>
       </section>
 
@@ -166,7 +163,7 @@ export default function PrinciplesPage() {
               style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: selectedYear === "ALL" ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}
               className="card-heading"
             >
-              ALL YEARS
+              {pageData?.evolved?.allLabel || "ALL YEARS"}
             </button>
             <span style={{ color: 'var(--color-structural)' }}>&mdash;</span>
             {years.map((year, idx) => (
@@ -203,7 +200,7 @@ export default function PrinciplesPage() {
                 borderBottom: selectedCategory === cat ? '1px solid var(--color-text-primary)' : '1px solid transparent'
               }}
             >
-              {cat}
+              {cat === "ALL" ? (pageData?.explore?.allLabel || "ALL") : cat}
             </button>
           ))}
         </div>
@@ -213,21 +210,21 @@ export default function PrinciplesPage() {
       {featuredPrinciple && selectedCategory === "ALL" && selectedYear === "ALL" && (
         <section className="section" style={{ paddingBottom: '64px' }}>
           <div className="ev-panel" style={{ padding: '64px', backgroundColor: 'var(--color-surface)' }}>
-            <span className="section-label" style={{ marginBottom: '24px', display: 'block' }}>{pageData.featured.label}</span>
+            <span className="section-label" style={{ marginBottom: '24px', display: 'block' }}>{pageData.featured.label || "FEATURED PRINCIPLE"}</span>
             <h3 className="section-heading" style={{ fontSize: '2.5rem', marginBottom: '24px', maxWidth: '800px' }}>
               {featuredPrinciple.statement}
             </h3>
             <p className="trust-body" style={{ fontSize: '1.25rem', marginBottom: '48px', maxWidth: '600px' }}>
-              A decision driven by the outcome:<br />
+              {pageData.featured.outcomeLabel || "A decision driven by the outcome:"}<br />
               <span style={{ color: 'var(--color-text-secondary)' }}>{featuredPrinciple.outcome}</span>
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <span className="section-label" style={{ fontSize: '0.75rem', margin: 0 }}>ORIGIN</span>
+              <span className="section-label" style={{ fontSize: '0.75rem', margin: 0 }}>{pageData.featured.originLabel || "ORIGIN"}</span>
               <span className="card-heading" style={{ color: 'var(--color-text-secondary)' }}>
                 {featuredPrinciple.sourceTitle.toUpperCase()} &middot; {featuredPrinciple.year}
               </span>
               <Link href={`/judgment/${featuredPrinciple.sourceSlug}`} className="judgment-cta" style={{ marginTop: '16px' }}>
-                READ THE DECISION &rarr;
+                {pageData.featured.cta || "READ THE DECISION →"}
               </Link>
             </div>
           </div>
@@ -239,7 +236,7 @@ export default function PrinciplesPage() {
         <h2 className="section-label" style={{ marginBottom: '64px' }}>{pageData.indexSection.title}</h2>
         
         {filteredPrinciples.length === 0 ? (
-          <p className="trust-body" style={{ color: 'var(--color-text-secondary)' }}>No principles match this filter.</p>
+          <p className="trust-body" style={{ color: 'var(--color-text-secondary)' }}>{pageData?.indexSection?.emptyText || "No principles match this filter."}</p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '64px' }}>
             {categories.filter(c => c !== "ALL" && (selectedCategory === "ALL" || selectedCategory === c)).map(cat => {

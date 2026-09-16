@@ -45,18 +45,29 @@ export default function PrinciplesEditor({ site }: { site: string }) {
   const logs = useMemo(() => (judgmentData?.logs || []), [judgmentData]);
   const principlesLogs = useMemo(() => logs.filter((l: any) => l.principle?.statement), [logs]);
 
+  const [saveStatus, setSaveStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  useEffect(() => {
+    if (saveStatus) {
+      const timer = setTimeout(() => setSaveStatus(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [saveStatus]);
+
   // --- Save helpers ---
   async function savePageContent() {
+    setSaveStatus(null);
     try {
       const res = await fetch(`/api/content/${site}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ table: "page_content", record: { id: "principles", content: pageData, updated_at: new Date().toISOString() } })
       });
+      if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
       const { error } = await res.json();
       if (error) throw new Error(error);
-      alert(`Page content saved to flowtaris.${site}!`);
-    } catch (e: any) { alert("Error: " + e.message); }
+      setSaveStatus({ type: "success", message: `Changes are saved to flowtaris.${site}!` });
+    } catch (e: any) { setSaveStatus({ type: "error", message: "Error: " + e.message }); }
   }
 
   async function saveJudgmentLogs(updatedLogs: any[]) {
@@ -67,10 +78,14 @@ export default function PrinciplesEditor({ site }: { site: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ table: "page_content", record: { id: "judgment", content, updated_at: new Date().toISOString() } })
       });
+      if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
       const { error } = await res.json();
       if (error) throw new Error(error);
       setJudgmentData(content);
-    } catch (e: any) { alert("Error: " + e.message); }
+    } catch (e: any) { 
+      setSaveStatus({ type: "error", message: "Error: " + e.message }); 
+      throw e; 
+    }
   }
 
   // --- Principle CRUD ---
@@ -85,6 +100,7 @@ export default function PrinciplesEditor({ site }: { site: string }) {
       principleStatement: log.principle?.statement || "",
       principleCategory: log.principle?.category || "",
       author: log.author || "",
+      isHidden: log.isHidden || false,
     });
   }
 
@@ -98,12 +114,14 @@ export default function PrinciplesEditor({ site }: { site: string }) {
       principleStatement: "",
       principleCategory: "Strategy",
       author: "",
+      isHidden: false,
     });
   }
 
   async function saveDraft() {
+    setSaveStatus(null);
     if (!draft.slug || !draft.principleStatement) {
-      alert("Slug and Principle Statement are required.");
+      setSaveStatus({ type: "error", message: "Slug and Principle Statement are required." });
       return;
     }
     const logEntry = {
@@ -118,6 +136,7 @@ export default function PrinciplesEditor({ site }: { site: string }) {
         statement: draft.principleStatement,
         category: draft.principleCategory,
       },
+      isHidden: draft.isHidden,
       outcome: { metrics: [], timeframe: "Outcome realized" },
     };
 
@@ -125,7 +144,7 @@ export default function PrinciplesEditor({ site }: { site: string }) {
     if (editingIdx === -1) {
       // new
       if (logs.some((l: any) => l.slug === draft.slug)) {
-        alert("A log with this slug already exists.");
+        setSaveStatus({ type: "error", message: "A log with this slug already exists." });
         return;
       }
       updatedLogs = [...logs, logEntry];
@@ -133,10 +152,10 @@ export default function PrinciplesEditor({ site }: { site: string }) {
       updatedLogs = logs.map((l: any, i: number) => i === editingIdx ? { ...l, ...logEntry } : l);
     }
 
-    await saveJudgmentLogs(updatedLogs);
-
-    // Also ensure the slug page exists
     try {
+      await saveJudgmentLogs(updatedLogs);
+
+      // Also ensure the slug page exists
       const slugId = `judgment_slug_${draft.slug}`;
       const slugRes = await fetch(`/api/content/${site}?table=page_content&id=${slugId}`);
       const slugJson = await slugRes.json();
@@ -169,20 +188,32 @@ export default function PrinciplesEditor({ site }: { site: string }) {
           })
         });
       }
+
+      setEditingIdx(null);
+      setDraft(null);
+      setSaveStatus({ type: "success", message: `Changes are saved to flowtaris.${site}!` });
     } catch (e) {
       console.error(e);
     }
-
-    setEditingIdx(null);
-    setDraft(null);
-    alert("Principle saved!");
   }
 
   async function deletePrinciple(idx: number) {
     if (!confirm("Remove this principle from the list?")) return;
+    setSaveStatus(null);
     const updatedLogs = logs.filter((_: any, i: number) => i !== idx);
-    await saveJudgmentLogs(updatedLogs);
-    alert("Principle removed.");
+    try {
+      await saveJudgmentLogs(updatedLogs);
+      setSaveStatus({ type: "success", message: `Changes are saved to flowtaris.${site}!` });
+    } catch (e) {}
+  }
+
+  async function toggleHidePrinciple(idx: number) {
+    setSaveStatus(null);
+    const updatedLogs = logs.map((l: any, i: number) => i === idx ? { ...l, isHidden: !l.isHidden } : l);
+    try {
+      await saveJudgmentLogs(updatedLogs);
+      setSaveStatus({ type: "success", message: `Visibility updated and saved to flowtaris.${site}!` });
+    } catch (e) {}
   }
 
   // --- Page content helpers ---
@@ -196,13 +227,26 @@ export default function PrinciplesEditor({ site }: { site: string }) {
       return { ...p, [section]: { ...p[section], steps: newSteps } };
     });
   };
+  const addStep = (section: string) => {
+    setPageData((p: any) => {
+      const newSteps = [...(p[section].steps || []), { label: "", color: "default" }];
+      return { ...p, [section]: { ...p[section], steps: newSteps } };
+    });
+  };
+  const removeStep = (section: string, idx: number) => {
+    setPageData((p: any) => {
+      const newSteps = [...(p[section].steps || [])];
+      newSteps.splice(idx, 1);
+      return { ...p, [section]: { ...p[section], steps: newSteps } };
+    });
+  };
 
   if (loading || !pageData || !judgmentData) return <div style={{ padding: 40 }}>Loading...</div>;
 
   return (
     <div style={{ maxWidth: 960 }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: "bold", color: "#111827", margin: 0 }}>Principles</h1>
           <p style={{ color: "#6B7280", fontSize: 14, marginTop: 4 }}>
@@ -210,6 +254,22 @@ export default function PrinciplesEditor({ site }: { site: string }) {
           </p>
         </div>
       </div>
+
+      {/* Save Status Banner */}
+      {saveStatus && (
+        <div style={{
+          padding: "12px 16px",
+          borderRadius: 8,
+          marginBottom: 20,
+          fontSize: 14,
+          fontWeight: 500,
+          background: saveStatus.type === "success" ? "#ECFDF5" : "#FEF2F2",
+          color: saveStatus.type === "success" ? "#065F46" : "#991B1B",
+          border: `1px solid ${saveStatus.type === "success" ? "#A7F3D0" : "#FECACA"}`,
+        }}>
+          {saveStatus.message}
+        </div>
+      )}
 
       {/* Tab Switcher */}
       <div style={{ display: "flex", gap: 0, marginBottom: 32, borderBottom: "2px solid #E5E7EB" }}>
@@ -272,7 +332,7 @@ export default function PrinciplesEditor({ site }: { site: string }) {
                     value={draft.principleCategory}
                     onChange={e => setDraft({ ...draft, principleCategory: e.target.value })}
                   >
-                    {["Strategy", "Tech", "Crisis", "Hiring", "Culture", "Pricing"].map(c => (
+                    {(pageData.explore.categories || ["Strategy", "Tech", "Crisis", "Hiring", "Culture", "Pricing"]).map((c: string) => (
                       <option key={c} value={c}>{c}</option>
                     ))}
                   </select>
@@ -351,7 +411,7 @@ export default function PrinciplesEditor({ site }: { site: string }) {
             </div>
           ) : (
             <div style={cardStyle}>
-              <div style={{ display: "grid", gridTemplateColumns: "40px 1fr 120px 100px 140px", gap: 0, padding: "0 16px 12px 16px", borderBottom: "1px solid #E5E7EB" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "40px 1fr 120px 100px 190px", gap: 0, padding: "0 16px 12px 16px", borderBottom: "1px solid #E5E7EB" }}>
                 {["#", "Principle", "Category", "Year", "Actions"].map(h => (
                   <span key={h} style={{ fontSize: 11, fontWeight: 600, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</span>
                 ))}
@@ -365,22 +425,23 @@ export default function PrinciplesEditor({ site }: { site: string }) {
                     key={log.slug || idx}
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "40px 1fr 120px 100px 140px",
+                      gridTemplateColumns: "40px 1fr 120px 100px 190px",
                       gap: 0,
                       padding: "16px",
                       borderBottom: "1px solid #F3F4F6",
                       alignItems: "center",
+                      opacity: log.isHidden ? 0.5 : 1,
                     }}
                   >
                     <span style={{ fontSize: 13, color: "#9CA3AF", fontWeight: 500 }}>{String(idx + 1).padStart(2, "0")}</span>
                     <div>
-                      <div style={{ fontWeight: 500, color: "#111827", fontSize: 14, marginBottom: 2 }}>
+                      <div style={{ fontWeight: 500, color: "#111827", fontSize: 14, marginBottom: 2, textDecoration: log.isHidden ? "line-through" : "none" }}>
                         {log.principle.statement.length > 60
                           ? log.principle.statement.substring(0, 60) + "…"
                           : log.principle.statement}
                       </div>
                       <div style={{ fontSize: 12, color: "#9CA3AF" }}>
-                        {log.title} · {log.author || "--"}
+                        {log.title} · {log.author || "--"} {log.isHidden && <span style={{ color: "#DC2626", fontWeight: 600 }}> (HIDDEN)</span>}
                       </div>
                     </div>
                     <span style={{ fontSize: 12, color: "#6B7280", background: "#F3F4F6", padding: "4px 8px", borderRadius: 4, textAlign: "center", width: "fit-content" }}>
@@ -388,6 +449,12 @@ export default function PrinciplesEditor({ site }: { site: string }) {
                     </span>
                     <span style={{ fontSize: 13, color: "#6B7280" }}>{year}</span>
                     <div style={{ display: "flex", gap: 6 }}>
+                      <button
+                        onClick={() => toggleHidePrinciple(idx)}
+                        style={{ background: log.isHidden ? "#F3F4F6" : "#FEF3C7", color: log.isHidden ? "#6B7280" : "#D97706", padding: "5px 10px", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12, fontWeight: 500 }}
+                      >
+                        {log.isHidden ? "Unhide" : "Hide"}
+                      </button>
                       <button
                         onClick={() => startEdit(idx)}
                         style={{ background: "#EFF6FF", color: "#2563EB", padding: "5px 10px", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12, fontWeight: 500 }}
@@ -428,6 +495,7 @@ export default function PrinciplesEditor({ site }: { site: string }) {
               <div><label style={labelStyle}>Eyebrow</label><input style={inputStyle} value={pageData.hero.eyebrow} onChange={e => updatePage("hero", "eyebrow", e.target.value)} /></div>
               <div><label style={labelStyle}>Title (use \n for line breaks)</label><textarea style={textareaStyle} value={pageData.hero.title} onChange={e => updatePage("hero", "title", e.target.value)} /></div>
               <div><label style={labelStyle}>Subtitle</label><textarea style={textareaStyle} value={pageData.hero.subtitle} onChange={e => updatePage("hero", "subtitle", e.target.value)} /></div>
+              <div><label style={labelStyle}>Stats (comma separated)</label><input style={inputStyle} value={(pageData.hero.stats || []).join(", ")} onChange={e => updatePage("hero", "stats", e.target.value.split(",").map(s => s.trim()))} placeholder="08 PRINCIPLES, 05 YEARS, UPDATED AUTOMATICALLY" /></div>
             </div>
           </div>
 
@@ -445,30 +513,60 @@ export default function PrinciplesEditor({ site }: { site: string }) {
           <div style={cardStyle}>
             <h2 style={sectionTitleStyle}>Principle / Decision Flow</h2>
             {(pageData.relationship.steps || []).map((step: any, i: number) => (
-              <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 140px", gap: 8, marginBottom: 8 }}>
+              <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 140px auto", gap: 8, marginBottom: 8, alignItems: "center" }}>
                 <input style={inputStyle} value={step.label} onChange={e => updateStep("relationship", i, "label", e.target.value)} placeholder="Step Label" />
                 <select style={inputStyle} value={step.color} onChange={e => updateStep("relationship", i, "color", e.target.value)}>
                   <option value="default">Default</option>
                   <option value="accent">Accent</option>
                 </select>
+                <button onClick={() => removeStep("relationship", i)} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 12px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500 }} title="Remove Step">✕</button>
               </div>
             ))}
+            <button onClick={() => addStep("relationship")} style={{ padding: "6px 12px", background: "#E5E7EB", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12, marginTop: 4 }}>+ Add Step</button>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
               <div><label style={labelStyle}>Footer Line 1</label><input style={inputStyle} value={pageData.relationship.footer1} onChange={e => updatePage("relationship", "footer1", e.target.value)} /></div>
               <div><label style={labelStyle}>Footer Line 2</label><input style={inputStyle} value={pageData.relationship.footer2} onChange={e => updatePage("relationship", "footer2", e.target.value)} /></div>
             </div>
           </div>
 
-          {/* Section Labels */}
+          {/* Categories Filter Section */}
           <div style={cardStyle}>
-            <h2 style={sectionTitleStyle}>Section Labels & Titles</h2>
+            <h2 style={sectionTitleStyle}>Categories Filter Section (e.g., EXPLORE PRINCIPLES)</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <div><label style={labelStyle}>Evolved Section Title</label><input style={inputStyle} value={pageData.evolved.title} onChange={e => updatePage("evolved", "title", e.target.value)} /></div>
-              <div><label style={labelStyle}>Explore Section Title</label><input style={inputStyle} value={pageData.explore.title} onChange={e => updatePage("explore", "title", e.target.value)} /></div>
-              <div><label style={labelStyle}>Featured Principle Label</label><input style={inputStyle} value={pageData.featured.label} onChange={e => updatePage("featured", "label", e.target.value)} /></div>
-              <div><label style={labelStyle}>Index Section Title</label><input style={inputStyle} value={pageData.indexSection.title} onChange={e => updatePage("indexSection", "title", e.target.value)} /></div>
+              <div><label style={labelStyle}>Section Title</label><input style={inputStyle} value={pageData.explore.title} onChange={e => updatePage("explore", "title", e.target.value)} placeholder="EXPLORE PRINCIPLES" /></div>
+              <div><label style={labelStyle}>'All' Button Label</label><input style={inputStyle} value={pageData.explore.allLabel || "ALL"} onChange={e => updatePage("explore", "allLabel", e.target.value)} placeholder="ALL" /></div>
             </div>
           </div>
+
+          {/* Principle List Section */}
+          <div style={cardStyle}>
+            <h2 style={sectionTitleStyle}>Principle List Section (e.g., PRINCIPLES)</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div><label style={labelStyle}>Section Title</label><input style={inputStyle} value={pageData.indexSection.title} onChange={e => updatePage("indexSection", "title", e.target.value)} placeholder="PRINCIPLES" /></div>
+              <div><label style={labelStyle}>Empty State Text</label><input style={inputStyle} value={pageData.indexSection.emptyText || "No principles match this filter."} onChange={e => updatePage("indexSection", "emptyText", e.target.value)} placeholder="No principles match this filter." /></div>
+            </div>
+          </div>
+
+          {/* Featured Principle Section */}
+          <div style={cardStyle}>
+            <h2 style={sectionTitleStyle}>Featured Principle Section</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={labelStyle}>Select Featured Principle</label>
+                <select style={inputStyle} value={pageData.featured.principleSlug || ""} onChange={e => updatePage("featured", "principleSlug", e.target.value)}>
+                  <option value="">-- Most Recent (Default) --</option>
+                  {principlesLogs.map((log: any) => (
+                    <option key={log.slug} value={log.slug}>{log.principle.statement.substring(0, 80)}</option>
+                  ))}
+                </select>
+              </div>
+              <div><label style={labelStyle}>Section Label</label><input style={inputStyle} value={pageData.featured.label} onChange={e => updatePage("featured", "label", e.target.value)} placeholder="FEATURED PRINCIPLE" /></div>
+              <div><label style={labelStyle}>Outcome Prefix Text</label><input style={inputStyle} value={pageData.featured.outcomeLabel || "A decision driven by the outcome:"} onChange={e => updatePage("featured", "outcomeLabel", e.target.value)} placeholder="A decision driven by the outcome:" /></div>
+              <div><label style={labelStyle}>Origin Label</label><input style={inputStyle} value={pageData.featured.originLabel || "ORIGIN"} onChange={e => updatePage("featured", "originLabel", e.target.value)} placeholder="ORIGIN" /></div>
+              <div><label style={labelStyle}>CTA Text</label><input style={inputStyle} value={pageData.featured.cta || "READ THE DECISION →"} onChange={e => updatePage("featured", "cta", e.target.value)} placeholder="READ THE DECISION →" /></div>
+            </div>
+          </div>
+
 
           {/* Judgment Connection */}
           <div style={cardStyle}>
@@ -486,14 +584,16 @@ export default function PrinciplesEditor({ site }: { site: string }) {
             <div><label style={labelStyle}>Title</label><input style={inputStyle} value={pageData.evidenceConnection.title} onChange={e => updatePage("evidenceConnection", "title", e.target.value)} /></div>
             <div style={{ marginTop: 12 }}>
               {(pageData.evidenceConnection.steps || []).map((step: any, i: number) => (
-                <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 140px", gap: 8, marginBottom: 8 }}>
+                <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 140px auto", gap: 8, marginBottom: 8, alignItems: "center" }}>
                   <input style={inputStyle} value={step.label} onChange={e => updateStep("evidenceConnection", i, "label", e.target.value)} placeholder="Step Label" />
                   <select style={inputStyle} value={step.color} onChange={e => updateStep("evidenceConnection", i, "color", e.target.value)}>
                     <option value="default">Default</option>
                     <option value="accent">Accent</option>
                   </select>
+                  <button onClick={() => removeStep("evidenceConnection", i)} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 12px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500 }} title="Remove Step">✕</button>
                 </div>
               ))}
+              <button onClick={() => addStep("evidenceConnection")} style={{ padding: "6px 12px", background: "#E5E7EB", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 12, marginTop: 4 }}>+ Add Step</button>
             </div>
             <div style={{ marginTop: 12 }}><label style={labelStyle}>CTA Text</label><input style={inputStyle} value={pageData.evidenceConnection.cta} onChange={e => updatePage("evidenceConnection", "cta", e.target.value)} /></div>
           </div>
@@ -514,13 +614,13 @@ export default function PrinciplesEditor({ site }: { site: string }) {
 
 function defaultPageData() {
   return {
-    hero: { eyebrow: "PRINCIPLES", title: "WHAT WE BELIEVE\\nAFTER MAKING THE\\nDECISION.", subtitle: "Principles extracted from the decisions we've actually made." },
+    hero: { eyebrow: "PRINCIPLES", title: "WHAT WE BELIEVE\\nAFTER MAKING THE\\nDECISION.", subtitle: "Principles extracted from the decisions we've actually made.", stats: ["08 PRINCIPLES", "05 YEARS", "UPDATED AUTOMATICALLY"] },
     intro: { title: "THESE AREN'T BRAND VALUES.", subtitle: "They're conclusions.", body: "Each principle came from a decision:\\nsomething we chose,\\nsomething we rejected,\\nand something we learned." },
     relationship: { steps: [{ label: "DECISION", color: "default" }, { label: "OUTCOME", color: "default" }, { label: "PRINCIPLE", color: "accent" }, { label: "FUTURE DECISIONS", color: "default" }], footer1: "A principle isn't written first.", footer2: "It is earned through a decision." },
-    evolved: { title: "HOW THE PRINCIPLES EVOLVED" },
-    explore: { title: "EXPLORE PRINCIPLES" },
-    featured: { label: "FEATURED PRINCIPLE" },
-    indexSection: { title: "PRINCIPLES" },
+    evolved: { title: "HOW THE PRINCIPLES EVOLVED", years: ["2019", "2020", "2022", "2023", "2024"], allLabel: "ALL YEARS" },
+    explore: { title: "EXPLORE PRINCIPLES", categories: ["CRISIS", "CULTURE", "STRATEGY", "TECH"], allLabel: "ALL" },
+    featured: { label: "FEATURED PRINCIPLE", principleSlug: "", outcomeLabel: "A decision driven by the outcome:", originLabel: "ORIGIN", cta: "READ THE DECISION →" },
+    indexSection: { title: "PRINCIPLES", emptyText: "No principles match this filter." },
     judgmentConnection: { title: "EVERY PRINCIPLE HAS A HISTORY.", desc: "READ THE DECISIONS\\nTHAT CREATED THEM.", cta: "EXPLORE JUDGMENT →" },
     evidenceConnection: { title: "PRINCIPLES → DECISIONS → EVIDENCE", steps: [{ label: "What we believe", color: "default" }, { label: "What we decided", color: "default" }, { label: "How we operate", color: "accent" }], cta: "EXPLORE EVIDENCE →" },
     closing: { title: "PRINCIPLES AREN'T PROMISES.", desc: "THEY'RE THE PATTERNS WE KEEP\\nAFTER THE DECISION IS MADE." }
