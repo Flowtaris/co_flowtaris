@@ -111,7 +111,42 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* --- MOVED SECTIONS START HERE --- */}
+      {/* PDF SECTION */}
+      {pdfs.length > 0 && (
+        <section className="section" id="resources" style={{ paddingBottom: '6rem' }}>
+          <h2 className="section-title section-heading">AVAILABLE RESOURCES</h2>
+          <div className="trust-grid">
+            {pdfs.map((pdf) => (
+              <div key={pdf.id} className="trust-card">
+                <h3 className="card-heading">{pdf.title}</h3>
+                <p className="trust-desc card-description">PDF Document</p>
+                <a href={pdf.url} target="_blank" rel="noreferrer" className="trust-cta">VIEW DOCUMENT &rarr;</a>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 6. THREE SYSTEMS OF TRUST */}
+      <section className="section trust-systems" id="trust">
+        <h2 className="section-title section-heading">{trustContent.title || "THREE SYSTEMS OF TRUST"}</h2>
+        <div className="trust-grid">
+          {(trustContent.systems || []).map((system: any) => (
+            <div key={system.id} className="trust-card">
+              <h3 className="card-heading">{system.heading}</h3>
+              <p className="trust-desc card-description">{system.description}</p>
+              {system.items && system.items.length > 0 && (
+                <ul className="trust-list">
+                  {system.items.map((item: string, i: number) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              )}
+              <a href={system.ctaLink} className="trust-cta">{system.ctaText}</a>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* 7. LATEST JUDGMENT */}
       <section className="section latest-judgment" id="judgment">
@@ -185,45 +220,6 @@ export default async function Home() {
         <div className="cta-buttons">
           <a href={homeSections.finalCta.primaryLink} className="cta-button primary">{homeSections.finalCta.primaryText}</a>
           <a href={homeSections.finalCta.secondaryLink} className="cta-button secondary">{homeSections.finalCta.secondaryText}</a>
-        </div>
-      </section>
-      
-      {/* --- MOVED SECTIONS END HERE --- */}
-
-      {/* PDF SECTION */}
-      {pdfs.length > 0 && (
-        <section className="section" id="resources" style={{ paddingBottom: '6rem' }}>
-          <h2 className="section-title section-heading">AVAILABLE RESOURCES</h2>
-          <div className="trust-grid">
-            {pdfs.map((pdf) => (
-              <div key={pdf.id} className="trust-card">
-                <h3 className="card-heading">{pdf.title}</h3>
-                <p className="trust-desc card-description">PDF Document</p>
-                <a href={pdf.url} target="_blank" rel="noreferrer" className="trust-cta">VIEW DOCUMENT &rarr;</a>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* 6. THREE SYSTEMS OF TRUST */}
-      <section className="section trust-systems" id="trust">
-        <h2 className="section-title section-heading">{trustContent.title || "THREE SYSTEMS OF TRUST"}</h2>
-        <div className="trust-grid">
-          {(trustContent.systems || []).map((system: any) => (
-            <div key={system.id} className="trust-card">
-              <h3 className="card-heading">{system.heading}</h3>
-              <p className="trust-desc card-description">{system.description}</p>
-              {system.items && system.items.length > 0 && (
-                <ul className="trust-list">
-                  {system.items.map((item: string, i: number) => (
-                    <li key={i}>{item}</li>
-                  ))}
-                </ul>
-              )}
-              <a href={system.ctaLink} className="trust-cta">{system.ctaText}</a>
-            </div>
-          ))}
         </div>
       </section>
 
