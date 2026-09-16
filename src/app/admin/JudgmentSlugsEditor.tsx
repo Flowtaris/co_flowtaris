@@ -94,10 +94,7 @@ export default function JudgmentSlugsEditor({ site }: { site: string }) {
   const [saveStatus, setSaveStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   useEffect(() => {
-    if (saveStatus) {
-      const timer = setTimeout(() => setSaveStatus(null), 4000);
-      return () => clearTimeout(timer);
-    }
+    if (saveStatus) { const timer = setTimeout(() => setSaveStatus(null), 4000); return () => clearTimeout(timer); } return undefined;
   }, [saveStatus]);
 
   async function saveSlugContent() {
@@ -148,16 +145,25 @@ export default function JudgmentSlugsEditor({ site }: { site: string }) {
       <p style={{ color: "#6B7280", marginBottom: 32, fontSize: 15 }}>Edit the detailed content for individual decision logs here.</p>
 
       <div style={{ background: "#fff", borderRadius: 12, padding: 32, boxShadow: "0 1px 3px rgba(0,0,0,0.05)", border: "1px solid #E5E7EB", marginBottom: 32 }}>
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ display: "block", marginBottom: 8, fontSize: 14, fontWeight: 500, color: "#374151" }}>Select Log to Edit</label>
-          <select value={selectedSlug} onChange={(e) => loadSlugContent(e.target.value)} style={{ width: "100%", maxWidth: 400, background: "#F9FAFB", border: "1px solid #D1D5DB", padding: "10px 12px", borderRadius: 6, fontSize: 14 }}>
-            <option value="">-- Select a Log --</option>
-            {decisionLogs.map((log: any) => {
-              const slug = log.href ? log.href.split('/').pop() : log.id;
-              return <option key={slug} value={slug}>{log.title}</option>;
-            })}
-          </select>
-        </div>
+        {!selectedSlug ? (
+          <div style={{ marginBottom: 24 }}>
+            <label style={{ display: "block", marginBottom: 8, fontSize: 14, fontWeight: 500, color: "#374151" }}>Select Log to Edit</label>
+            <select value={selectedSlug} onChange={(e) => loadSlugContent(e.target.value)} style={{ width: "100%", maxWidth: 400, background: "#F9FAFB", border: "1px solid #D1D5DB", padding: "10px 12px", borderRadius: 6, fontSize: 14 }}>
+              <option value="">-- Select a Log --</option>
+              {decisionLogs.map((log: any) => {
+                const slug = log.href ? log.href.split('/').pop() : log.id;
+                return <option key={slug} value={slug}>{log.title}</option>;
+              })}
+            </select>
+          </div>
+        ) : (
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, paddingBottom: 16, borderBottom: "1px solid #E5E7EB" }}>
+            <div>
+              <h2 style={{ fontSize: 18, fontWeight: 600, color: "#111827", margin: 0 }}>Editing: {slugData?.title || selectedSlug}</h2>
+            </div>
+            <button onClick={() => setSelectedSlug("")} style={{ background: "#F3F4F6", color: "#374151", padding: "8px 16px", border: "1px solid #D1D5DB", borderRadius: 6, cursor: "pointer", fontWeight: 500, fontSize: 14 }}>&larr; Back to Selection</button>
+          </div>
+        )}
 
         {selectedSlug && (
           <>
@@ -241,7 +247,10 @@ export default function JudgmentSlugsEditor({ site }: { site: string }) {
               </div>
             )}
 
-            <button onClick={saveSlugContent} disabled={isSlugLoading} style={{ background: "#2563EB", color: "#fff", padding: "10px 24px", border: "none", borderRadius: 6, cursor: "pointer", fontWeight: 500, fontSize: 14 }}>Save Slug Content</button>
+            <div style={{ display: "flex", gap: 16, marginTop: 24, borderTop: "1px solid #E5E7EB", paddingTop: 24 }}>
+              <button onClick={saveSlugContent} disabled={isSlugLoading} style={{ background: "#2563EB", color: "#fff", padding: "10px 24px", border: "none", borderRadius: 6, cursor: "pointer", fontWeight: 500, fontSize: 14 }}>Save Slug Content</button>
+              <button onClick={() => setSelectedSlug("")} style={{ background: "#F3F4F6", color: "#374151", padding: "10px 24px", border: "1px solid #D1D5DB", borderRadius: 6, cursor: "pointer", fontWeight: 500, fontSize: 14 }}>&larr; Back to Selection</button>
+            </div>
           </>
         )}
       </div>
