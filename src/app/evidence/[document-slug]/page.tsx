@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
 
 // Mock Data Model to drive the dynamic route
@@ -79,14 +79,42 @@ const evidenceData: Record<string, any> = {
 export default function EvidenceDocumentPage() {
   const params = useParams();
   const rawSlug = params?.["document-slug"] as string || "";
-  const doc = evidenceData[rawSlug];
   
+  const [doc, setDoc] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [activeToc, setActiveToc] = useState<string>("01");
   const [zoom, setZoom] = useState<number>(100);
   const [page, setPage] = useState<number>(1);
   const [mobileTocOpen, setMobileTocOpen] = useState(false);
 
-  // If no document is found in our mock
+  useEffect(() => {
+    async function fetchDoc() {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/content/co?table=page_content&id=evidence_doc_${rawSlug}`);
+        const { data: resData } = await res.json();
+        if (resData && resData.length > 0 && resData[0].content) {
+          setDoc(resData[0].content);
+        } else {
+          setDoc(evidenceData[rawSlug] || null);
+        }
+      } catch (e) {
+        setDoc(evidenceData[rawSlug] || null);
+      }
+      setLoading(false);
+    }
+    fetchDoc();
+  }, [rawSlug]);
+
+  // If no document is found in our mock or database
+  if (loading) {
+    return (
+      <div className="section" style={{ paddingTop: '120px', minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        Loading...
+      </div>
+    );
+  }
+
   if (!doc) {
     return (
       <div className="section" style={{ paddingTop: '120px', minHeight: '60vh' }}>

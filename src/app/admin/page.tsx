@@ -19,6 +19,7 @@ import ContactEditor from "./ContactEditor";
 import EvidenceEditor from "./EvidenceEditor";
 import OperationsEvidenceEditor from "./OperationsEvidenceEditor";
 import SecurityEvidenceEditor from "./SecurityEvidenceEditor";
+import InformationSecurityPolicyEditor from "./InformationSecurityPolicyEditor";
 import QuestionnaireEditor from "./QuestionnaireEditor";
 import RegisterEditor from "./RegisterEditor";
 import HomeSectionsEditor from "./HomeSectionsEditor";
@@ -53,6 +54,7 @@ const sidebarLinks = [
   { id: "evidence", label: "Evidence Main", icon: <ShieldCheck size={18} /> },
   { id: "evidence_operations", label: "Evidence Operations", icon: <ShieldCheck size={18} /> },
   { id: "evidence_security", label: "Evidence Security", icon: <ShieldCheck size={18} /> },
+  { id: "evidence_infosec", label: "Info Security Policy", icon: <ShieldCheck size={18} /> },
   { id: "questionnaire", label: "Questionnaire Center", icon: <FileBox size={18} /> },
   { id: "contact", label: "Contact Page", icon: <MessageSquare size={18} /> },
   { id: "resources", label: "PDF Resources", icon: <FileBox size={18} /> },
@@ -189,6 +191,7 @@ export default function AdminPage() {
                 <DashboardCard icon={<ShieldCheck size={20} color="#10B981" />} iconBg="#ECFDF5" title="Evidence Main" description="Manage evidence documents, library, and policies." actions={[{ label: "Manage Evidence →", onClick: () => setActiveTab("evidence") }]} />
                 <DashboardCard icon={<ShieldCheck size={20} color="#059669" />} iconBg="#D1FAE5" title="Evidence Operations" description="Manage operations model, incident escalation, and RTO/RPO." actions={[{ label: "Manage Operations →", onClick: () => setActiveTab("evidence_operations") }]} />
                 <DashboardCard icon={<ShieldCheck size={20} color="#047857" />} iconBg="#D1FAE5" title="Evidence Security" description="Manage security controls, policies, and incident response." actions={[{ label: "Manage Security →", onClick: () => setActiveTab("evidence_security") }]} />
+                <DashboardCard icon={<ShieldCheck size={20} color="#064E3B" />} iconBg="#D1FAE5" title="Info Security Policy" description="Manage Information Security Policy document evidence." actions={[{ label: "Manage Policy →", onClick: () => setActiveTab("evidence_infosec") }]} />
                 <DashboardCard icon={<FileBox size={20} color="#0EA5E9" />} iconBg="#F0F9FF" title="Questionnaire Center" description="Manage pre-filled security and compliance questionnaires." actions={[{ label: "Manage Questionnaires →", onClick: () => setActiveTab("questionnaire") }]} />
                 <DashboardCard icon={<MessageSquare size={20} color="#3B82F6" />} iconBg="#EFF6FF" title="Contact Page" description="Manage contact routing blocks, addresses, and corporate info." actions={[{ label: "Manage Contact →", onClick: () => setActiveTab("contact") }]} />
                 <DashboardCard icon={<Briefcase size={20} color="#6366F1" />} iconBg="#EEF2FF" title="NetSuite Alliance" description="Manage the NetSuite strategic alliance page content." actions={[{ label: "Manage NetSuite →", onClick: () => setActiveTab("netsuite") }]} />
@@ -211,6 +214,7 @@ export default function AdminPage() {
           {activeTab === "evidence"       && <EvidenceEditor site={activeSite} />}
           {activeTab === "evidence_operations" && <OperationsEvidenceEditor site={activeSite} />}
           {activeTab === "evidence_security" && <SecurityEvidenceEditor site={activeSite} />}
+          {activeTab === "evidence_infosec" && <InformationSecurityPolicyEditor site={activeSite} />}
           {activeTab === "questionnaire"  && <QuestionnaireEditor site={activeSite} />}
           {activeTab === "contact"        && <ContactEditor site={activeSite} />}
           {activeTab === "resources"      && <ResourcesEditor site={activeSite} />}
