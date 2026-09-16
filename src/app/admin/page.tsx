@@ -15,8 +15,9 @@ import WorkdayEditor from "./WorkdayEditor";
 import NetsuiteEditor from "./NetsuiteEditor";
 import CoupaEditor from "./CoupaEditor";
 import FooterEditor from "./FooterEditor";
-import EvidenceEditor from "./EvidenceEditor";
 import ContactEditor from "./ContactEditor";
+import EvidenceEditor from "./EvidenceEditor";
+import OperationsEvidenceEditor from "./OperationsEvidenceEditor";
 import QuestionnaireEditor from "./QuestionnaireEditor";
 import RegisterEditor from "./RegisterEditor";
 import HomeSectionsEditor from "./HomeSectionsEditor";
@@ -40,7 +41,7 @@ import {
 // ── Sidebar Configuration ──────────────────────────────────────────
 const sidebarLinks = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
-  { id: "hero", label: "Hero", icon: <Type size={18} /> },
+  { id: "hero", label: "Homepage & Hero", icon: <LayoutDashboard size={18} /> },
   { id: "home_sections", label: "Homepage Content", icon: <LayoutDashboard size={18} /> },
   { id: "judgment", label: "Judgment Page", icon: <Scale size={18} /> },
   { id: "judgment_slugs", label: "Judgment Slugs", icon: <FileText size={18} /> },
@@ -48,7 +49,8 @@ const sidebarLinks = [
   { id: "statement", label: "Trust Statement", icon: <MessageSquare size={18} /> },
   { id: "leverage", label: "Leverage Page", icon: <Grid size={18} /> },
   { id: "register", label: "Deal Registration", icon: <FileText size={18} /> },
-  { id: "evidence", label: "Evidence Page", icon: <ShieldCheck size={18} /> },
+  { id: "evidence", label: "Evidence Main", icon: <ShieldCheck size={18} /> },
+  { id: "evidence_operations", label: "Evidence Operations", icon: <ShieldCheck size={18} /> },
   { id: "questionnaire", label: "Questionnaire Center", icon: <FileBox size={18} /> },
   { id: "contact", label: "Contact Page", icon: <MessageSquare size={18} /> },
   { id: "resources", label: "PDF Resources", icon: <FileBox size={18} /> },
@@ -180,8 +182,10 @@ export default function AdminPage() {
                 <DashboardCard icon={<Scale size={20} color="#F59E0B" />} iconBg="#FFFBEB" title="Judgment Logs" description="Update the featured decision logs displayed on the homepage." actions={[{ label: "Manage Logs →", onClick: () => setActiveTab("judgment") }]} />
                 <DashboardCard icon={<BookOpen size={20} color="#EC4899" />} iconBg="#FDF2F8" title="Principles" description="Manage the principles derived from decision logs and page content." actions={[{ label: "Manage Principles →", onClick: () => setActiveTab("principles") }]} />
                 <DashboardCard icon={<Grid size={20} color="#6366F1" />} iconBg="#EEF2FF" title="Leverage Page" description="Manage alliances, partnerships, and the specialist network." actions={[{ label: "Manage Leverage →", onClick: () => setActiveTab("leverage") }]} />
+                <DashboardCard icon={<FileText size={20} color="#0284C7" />} iconBg="#E0F2FE" title="Principles & Process" description="Manage principles and delivery process components." actions={[{ label: "Manage Principles →", onClick: () => setActiveTab("principles") }]} />
                 <DashboardCard icon={<FileText size={20} color="#6366F1" />} iconBg="#EEF2FF" title="Deal Registration" description="Manage the form fields and layout of the partner registration page." actions={[{ label: "Manage Registration →", onClick: () => setActiveTab("register") }]} />
-                <DashboardCard icon={<ShieldCheck size={20} color="#10B981" />} iconBg="#ECFDF5" title="Evidence Page" description="Manage evidence documents, questionnaires, and policies." actions={[{ label: "Manage Evidence →", onClick: () => setActiveTab("evidence") }]} />
+                <DashboardCard icon={<ShieldCheck size={20} color="#10B981" />} iconBg="#ECFDF5" title="Evidence Main" description="Manage evidence documents, library, and policies." actions={[{ label: "Manage Evidence →", onClick: () => setActiveTab("evidence") }]} />
+                <DashboardCard icon={<ShieldCheck size={20} color="#059669" />} iconBg="#D1FAE5" title="Evidence Operations" description="Manage operations model, incident escalation, and RTO/RPO." actions={[{ label: "Manage Operations →", onClick: () => setActiveTab("evidence_operations") }]} />
                 <DashboardCard icon={<FileBox size={20} color="#0EA5E9" />} iconBg="#F0F9FF" title="Questionnaire Center" description="Manage pre-filled security and compliance questionnaires." actions={[{ label: "Manage Questionnaires →", onClick: () => setActiveTab("questionnaire") }]} />
                 <DashboardCard icon={<MessageSquare size={20} color="#3B82F6" />} iconBg="#EFF6FF" title="Contact Page" description="Manage contact routing blocks, addresses, and corporate info." actions={[{ label: "Manage Contact →", onClick: () => setActiveTab("contact") }]} />
                 <DashboardCard icon={<Briefcase size={20} color="#6366F1" />} iconBg="#EEF2FF" title="NetSuite Alliance" description="Manage the NetSuite strategic alliance page content." actions={[{ label: "Manage NetSuite →", onClick: () => setActiveTab("netsuite") }]} />
@@ -202,6 +206,7 @@ export default function AdminPage() {
           {activeTab === "leverage"       && <LeverageEditor site={activeSite} />}
           {activeTab === "register"       && <RegisterEditor site={activeSite} />}
           {activeTab === "evidence"       && <EvidenceEditor site={activeSite} />}
+          {activeTab === "evidence_operations" && <OperationsEvidenceEditor site={activeSite} />}
           {activeTab === "questionnaire"  && <QuestionnaireEditor site={activeSite} />}
           {activeTab === "contact"        && <ContactEditor site={activeSite} />}
           {activeTab === "resources"      && <ResourcesEditor site={activeSite} />}
