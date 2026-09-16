@@ -135,11 +135,15 @@ export default function ResourcesEditor({ site }: { site: string }) {
           <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
             {pdfs.map((pdf, idx) => (
               <li key={pdf.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 24px", borderBottom: idx < pdfs.length - 1 ? "1px solid #E5E7EB" : "none" }}>
-                <div>
+                <div style={{ flex: 1, minWidth: 0, paddingRight: 16 }}>
                   <div style={{ fontWeight: 500, color: "#111827", marginBottom: 4 }}>{pdf.title}</div>
-                  <a href={pdf.url} target="_blank" rel="noreferrer" style={{ fontSize: 13, color: "#2563EB", textDecoration: "none" }}>{pdf.url}</a>
+                  <a href={pdf.url} target="_blank" rel="noreferrer" style={{ fontSize: 13, color: "#2563EB", textDecoration: "none", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pdf.url}</a>
                 </div>
-                <button onClick={() => deletePdf(pdf.id)} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "6px 12px", border: "none", borderRadius: 4, cursor: "pointer", fontSize: 13, fontWeight: 500 }}>Remove</button>
+                <div style={{ padding: "0 24px", textAlign: "center", borderLeft: "1px solid #E5E7EB", borderRight: "1px solid #E5E7EB", marginRight: 24 }}>
+                  <div style={{ fontSize: 20, fontWeight: 600, color: "#111827", lineHeight: 1 }}>{pdf.downloads || 0}</div>
+                  <div style={{ fontSize: 11, color: "#6B7280", textTransform: "uppercase", fontWeight: 600, marginTop: 4, letterSpacing: "0.05em" }}>Downloads</div>
+                </div>
+                <button onClick={() => deletePdf(pdf.id)} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 16px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500 }}>Remove</button>
               </li>
             ))}
           </ul>

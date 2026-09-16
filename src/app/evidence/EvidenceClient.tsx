@@ -80,7 +80,7 @@ export default function EvidenceClient({ data }: { data: any }) {
                   <td className="ev-td">{doc.type}</td>
                   <td className="ev-td">{doc.updated}</td>
                   <td className="ev-td" style={{ textAlign: 'right' }}>
-                    <a href={doc.url || "#"} className="judgment-cta ev-dl-link">{doc.cta || "DOWNLOAD \u2192"}</a>
+                    <a href={`/api/download?site=co&url=${encodeURIComponent(doc.url || "#")}`} className="judgment-cta ev-dl-link">{doc.cta || "DOWNLOAD \u2192"}</a>
                   </td>
                 </tr>
               ))}
