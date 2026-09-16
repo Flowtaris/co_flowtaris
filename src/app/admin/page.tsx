@@ -38,8 +38,7 @@ import {
 // ── Sidebar Configuration ──────────────────────────────────────────
 const sidebarLinks = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
-  { id: "hero", label: "Homepage & Hero", icon: <Type size={18} /> },
-  { id: "hero", label: "Hero (Home)", icon: <LayoutDashboard size={18} /> },
+  { id: "hero", label: "Hero", icon: <Type size={18} /> },
   { id: "home_sections", label: "Homepage Content", icon: <LayoutDashboard size={18} /> },
   { id: "judgment", label: "Judgment Page", icon: <Scale size={18} /> },
   { id: "judgment_slugs", label: "Judgment Slugs", icon: <FileText size={18} /> },
@@ -171,9 +170,8 @@ export default function AdminPage() {
               <h1 style={{ fontSize: 28, fontWeight: "bold", color: "#111827", marginBottom: 8 }}>Dashboard Overview</h1>
               <p style={{ color: "#6B7280", marginBottom: 40, fontSize: 15 }}>Manage your Flowtaris web presence content from here.</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 24 }}>
-                <DashboardCard icon={<Type size={20} color="#3B82F6" />} iconBg="#EFF6FF" title="Homepage & Hero" description="Edit the global hero text, subtitles, and the main messaging of the site." actions={[{ label: "Manage Hero →", onClick: () => setActiveTab("hero") }]} />
                 <DashboardCard icon={<FileBox size={20} color="#8B5CF6" />} iconBg="#F5F3FF" title="PDF Resources" description="Add, update, or remove downloadable PDF documents from the main page." actions={[{ label: "Manage PDFs →", onClick: () => setActiveTab("resources") }]} />
-                <DashboardCard icon={<LayoutDashboard size={20} color="#3B82F6" />} iconBg="#EFF6FF" title="Hero Section (Home)" description="Manage the primary H1, sub-headline, and the hero image." actions={[{ label: "Manage Hero →", onClick: () => setActiveTab("hero") }]} />
+                <DashboardCard icon={<LayoutDashboard size={20} color="#3B82F6" />} iconBg="#EFF6FF" title="Hero" description="Manage the primary H1, sub-headline, and the hero image." actions={[{ label: "Manage Hero →", onClick: () => setActiveTab("hero") }]} />
                 <DashboardCard icon={<LayoutDashboard size={20} color="#3B82F6" />} iconBg="#EFF6FF" title="Homepage Content" description="Manage the featured judgment logs, trust statements, and final CTAs on the homepage." actions={[{ label: "Manage Content →", onClick: () => setActiveTab("home_sections") }]} />
                 <DashboardCard icon={<Scale size={20} color="#F59E0B" />} iconBg="#FFFBEB" title="Judgment Logs" description="Update the featured decision logs displayed on the homepage." actions={[{ label: "Manage Logs →", onClick: () => setActiveTab("judgment") }]} />
                 <DashboardCard icon={<BookOpen size={20} color="#EC4899" />} iconBg="#FDF2F8" title="Principles" description="Manage the principles derived from decision logs and page content." actions={[{ label: "Manage Principles →", onClick: () => setActiveTab("principles") }]} />
