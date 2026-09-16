@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     if (process.env.RESEND_API_KEY) {
       const { data, error } = await resend.emails.send({
         from: 'Flowtaris Deal Registry <onboarding@resend.dev>', // Using Resend's default sender for testing if domain isn't verified
-        to: ['support@flowtaris.com'],
+        to: [process.env.RESEND_TO_EMAIL || 'support@flowtaris.com'],
         subject: `New Deal Registration`,
         html: emailHtml,
       });
