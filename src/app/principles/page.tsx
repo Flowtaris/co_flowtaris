@@ -166,7 +166,7 @@ export default function PrinciplesPage() {
               {pageData?.evolved?.allLabel || "ALL YEARS"}
             </button>
             <span style={{ color: 'var(--color-structural)' }}>&mdash;</span>
-            {years.map((year, idx) => (
+            {years.map((year: string, idx: number) => (
               <div key={year} style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
                 <button 
                   onClick={() => setSelectedYear(year)}

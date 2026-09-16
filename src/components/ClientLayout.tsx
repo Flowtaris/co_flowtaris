@@ -14,6 +14,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     async function fetchFooter() {
       if (isAdmin) return;
       try {
+        if (!supabase) return;
         const { data } = await supabase.from("page_content").select("content").eq("id", "footer").single();
         if (data?.content) {
           setFooterData(data.content);

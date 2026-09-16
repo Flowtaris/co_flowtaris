@@ -14,6 +14,7 @@ export function Header() {
   useEffect(() => {
     async function fetchHeader() {
       try {
+        if (!supabase) return;
         const { data } = await supabase.from("page_content").select("content").eq("id", "home").single();
         if (data?.content) {
           if (data.content.headerLinks) setLinks(data.content.headerLinks);

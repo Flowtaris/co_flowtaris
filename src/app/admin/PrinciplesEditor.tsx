@@ -534,7 +534,7 @@ export default function PrinciplesEditor({ site }: { site: string }) {
             <h2 style={sectionTitleStyle}>Categories Filter Section (e.g., EXPLORE PRINCIPLES)</h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <div><label style={labelStyle}>Section Title</label><input style={inputStyle} value={pageData.explore.title} onChange={e => updatePage("explore", "title", e.target.value)} placeholder="EXPLORE PRINCIPLES" /></div>
-              <div><label style={labelStyle}>'All' Button Label</label><input style={inputStyle} value={pageData.explore.allLabel || "ALL"} onChange={e => updatePage("explore", "allLabel", e.target.value)} placeholder="ALL" /></div>
+              <div><label style={labelStyle}>&apos;All&apos; Button Label</label><input style={inputStyle} value={pageData.explore.allLabel || "ALL"} onChange={e => updatePage("explore", "allLabel", e.target.value)} placeholder="ALL" /></div>
             </div>
           </div>
 

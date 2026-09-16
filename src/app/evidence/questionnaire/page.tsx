@@ -210,7 +210,7 @@ export default async function QuestionnaireCenterPage() {
         <div className="ev-access-inner">
           <h2 className="section-heading" style={{ fontSize: '2rem', marginBottom: '16px' }}>{data.customQuestionnaire.heading}</h2>
           <p className="trust-body ev-access-desc" style={{ maxWidth: '600px', fontSize: '1.25rem', marginBottom: '48px' }} dangerouslySetInnerHTML={{ __html: (data.customQuestionnaire.desc || "").replace(/\n/g, '<br />') }}></p>
-          <form className="ev-access-form" onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <form className="ev-access-form" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div className="ev-access-input-group" style={{ flexDirection: 'column', border: 'none', gap: '24px' }}>
               <div style={{ display: 'flex', border: '1px solid var(--color-structural)' }}>
                 <input 
@@ -220,7 +220,7 @@ export default async function QuestionnaireCenterPage() {
                   required 
                 />
               </div>
-              <button type="submit" className="judgment-cta" style={{ alignSelf: 'flex-start', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+              <button type="button" className="judgment-cta" style={{ alignSelf: 'flex-start', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
                 {data.customQuestionnaire.cta}
               </button>
             </div>
