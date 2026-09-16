@@ -6,7 +6,7 @@ const DEFAULT_DATA = {
   hero: {
     eyebrow: "OPERATIONS",
     title: "HOW THE WORK\\nACTUALLY RUNS.",
-    subtitle: "Delivery, support, escalation, change management\\nand recovery \u2014 documented before they're needed.",
+    subtitle: "Delivery, support, escalation, change management\\nand recovery — documented before they're needed.",
     stats: {
       count: "05 OPERATING AREAS",
       lastReviewedLabel: "LAST REVIEWED",
@@ -32,13 +32,13 @@ const DEFAULT_DATA = {
       { title: "MONITORING", desc: "Operational health and relevant system signals." },
       { title: "ESCALATION", desc: "Defined path from operational issue to leadership when required." }
     ],
-    ctaText: "VIEW OPERATIONS RUNBOOK \u2192",
+    ctaText: "VIEW OPERATIONS RUNBOOK →",
     ctaLink: "#"
   },
   serviceCommitments: {
     label: "SERVICE COMMITMENTS",
     slaLabel: "SERVICE LEVEL AGREEMENT",
-    slaCta: "VIEW SLA \u2192",
+    slaCta: "VIEW SLA →",
     slaLink: "#",
     tiers: [
       { tier: "STANDARD", response: "[DEFINED]", availability: "[DEFINED]" },
@@ -56,8 +56,8 @@ const DEFAULT_DATA = {
     rto: { title: "RTO", label: "RECOVERY TIME OBJECTIVE", desc: "How quickly the service is expected\\nto be restored.", value: "[ VALUE ]" },
     rpo: { title: "RPO", label: "RECOVERY POINT OBJECTIVE", desc: "How much data loss is acceptable\\nwithin the defined recovery model.", value: "[ VALUE ]" },
     ctas: [
-      { text: "RECOVERY RUNBOOK \u2192", link: "#" },
-      { text: "BUSINESS CONTINUITY PLAN \u2192", link: "#" }
+      { text: "RECOVERY RUNBOOK →", link: "#" },
+      { text: "BUSINESS CONTINUITY PLAN →", link: "#" }
     ]
   },
   changeManagement: {
@@ -84,7 +84,7 @@ const DEFAULT_DATA = {
     title: "WE WATCH THE SYSTEMS\\nTHAT MATTER.",
     desc: "Operational monitoring provides visibility\\ninto system health, service degradation\\nand incidents.",
     areas: ["APPLICATION HEALTH", "INFRASTRUCTURE", "DEPENDENCIES", "CRITICAL SERVICES", "INCIDENT STATE"],
-    cta: "INCIDENT RESPONSE POLICY \u2192",
+    cta: "INCIDENT RESPONSE POLICY →",
     link: "#"
   },
   operationalDocuments: {
@@ -164,6 +164,31 @@ export default function OperationsEvidenceEditor({ site }: { site: string }) {
   }
 
   const update = (section: string, key: string, value: any) => setData((p: any) => ({ ...p, [section]: { ...p[section], [key]: value } }));
+  const updateNested = (section: string, nested: string, key: string, value: any) => setData((p: any) => ({ ...p, [section]: { ...p[section], [nested]: { ...p[section][nested], [key]: value } } }));
+
+  const updateArrayItem = (section: string, arrKey: string, index: number, field: string, value: any) => {
+    setData((prev: any) => {
+      const arr = [...(prev[section][arrKey] || [])];
+      arr[index] = { ...arr[index], [field]: value };
+      return { ...prev, [section]: { ...prev[section], [arrKey]: arr } };
+    });
+  };
+
+  const removeArrayItem = (section: string, arrKey: string, index: number) => {
+    setData((prev: any) => {
+      const arr = [...(prev[section][arrKey] || [])];
+      arr.splice(index, 1);
+      return { ...prev, [section]: { ...prev[section], [arrKey]: arr } };
+    });
+  };
+
+  const addArrayItem = (section: string, arrKey: string, template: any) => {
+    setData((prev: any) => {
+      const arr = [...(prev[section][arrKey] || [])];
+      arr.push(template);
+      return { ...prev, [section]: { ...prev[section], [arrKey]: arr } };
+    });
+  };
 
   if (loading || !data) return <div>Loading...</div>;
 
@@ -188,10 +213,170 @@ export default function OperationsEvidenceEditor({ site }: { site: string }) {
         
         <h3 style={{ fontSize: 14, fontWeight: 600, marginTop: 16, marginBottom: 8 }}>Stats</h3>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-          <input value={data.hero.stats.count} onChange={e => setData((p:any) => ({...p, hero: {...p.hero, stats: {...p.hero.stats, count: e.target.value}}}))} placeholder="Count (e.g. 05 OPERATING AREAS)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
-          <input value={data.hero.stats.lastReviewedLabel} onChange={e => setData((p:any) => ({...p, hero: {...p.hero, stats: {...p.hero.stats, lastReviewedLabel: e.target.value}}}))} placeholder="Label (LAST REVIEWED)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
-          <input value={data.hero.stats.lastReviewedDate} onChange={e => setData((p:any) => ({...p, hero: {...p.hero, stats: {...p.hero.stats, lastReviewedDate: e.target.value}}}))} placeholder="Date (MAR 2026)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
+          <input value={data.hero.stats.count} onChange={e => updateNested("hero", "stats", "count", e.target.value)} placeholder="Count (e.g. 05 OPERATING AREAS)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
+          <input value={data.hero.stats.lastReviewedLabel} onChange={e => updateNested("hero", "stats", "lastReviewedLabel", e.target.value)} placeholder="Label (LAST REVIEWED)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
+          <input value={data.hero.stats.lastReviewedDate} onChange={e => updateNested("hero", "stats", "lastReviewedDate", e.target.value)} placeholder="Date (MAR 2026)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6 }} />
         </div>
+      </div>
+
+      {/* Operating Model */}
+      <div style={{ background: "#fff", borderRadius: 12, padding: 32, border: "1px solid #E5E7EB", marginBottom: 24 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>The Operating Model</h2>
+        <input value={data.operatingModel.label} onChange={e => update("operatingModel", "label", e.target.value)} placeholder="Label" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 16 }} />
+        
+        {(data.operatingModel.steps || []).map((step: any, i: number) => (
+          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+            <input value={step.num || ""} onChange={e => updateArrayItem("operatingModel", "steps", i, "num", e.target.value)} placeholder="Num" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, width: 60 }} />
+            <input value={step.title || ""} onChange={e => updateArrayItem("operatingModel", "steps", i, "title", e.target.value)} placeholder="Title" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, width: 140 }} />
+            <input value={step.desc || ""} onChange={e => updateArrayItem("operatingModel", "steps", i, "desc", e.target.value)} placeholder="Description" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+            <button onClick={() => removeArrayItem("operatingModel", "steps", i)} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 12px", border: "none", borderRadius: 6, cursor: "pointer" }}>✕</button>
+          </div>
+        ))}
+        <button onClick={() => addArrayItem("operatingModel", "steps", { num: "", title: "", desc: "" })} style={{ background: "#E5E7EB", padding: "8px 16px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500, marginTop: 8 }}>+ Add Step</button>
+      </div>
+
+      {/* Service Operations */}
+      <div style={{ background: "#fff", borderRadius: 12, padding: 32, border: "1px solid #E5E7EB", marginBottom: 24 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Service Operations</h2>
+        <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+          <input value={data.serviceOperations.num} onChange={e => update("serviceOperations", "num", e.target.value)} placeholder="Num" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: 60 }} />
+          <input value={data.serviceOperations.title} onChange={e => update("serviceOperations", "title", e.target.value)} placeholder="Title" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+        </div>
+        <textarea value={data.serviceOperations.desc} onChange={e => update("serviceOperations", "desc", e.target.value)} placeholder="Description" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 16, height: 60 }} />
+        
+        <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Blocks</h3>
+        {(data.serviceOperations.blocks || []).map((block: any, i: number) => (
+          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+            <input value={block.title || ""} onChange={e => updateArrayItem("serviceOperations", "blocks", i, "title", e.target.value)} placeholder="Block Title" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, width: 140 }} />
+            <input value={block.desc || ""} onChange={e => updateArrayItem("serviceOperations", "blocks", i, "desc", e.target.value)} placeholder="Block Description" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+            <button onClick={() => removeArrayItem("serviceOperations", "blocks", i)} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 12px", border: "none", borderRadius: 6, cursor: "pointer" }}>✕</button>
+          </div>
+        ))}
+        <button onClick={() => addArrayItem("serviceOperations", "blocks", { title: "", desc: "" })} style={{ background: "#E5E7EB", padding: "8px 16px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500, marginTop: 8, marginBottom: 16 }}>+ Add Block</button>
+
+        <div style={{ display: "flex", gap: 8 }}>
+          <input value={data.serviceOperations.ctaText} onChange={e => update("serviceOperations", "ctaText", e.target.value)} placeholder="CTA Text" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+          <input value={data.serviceOperations.ctaLink} onChange={e => update("serviceOperations", "ctaLink", e.target.value)} placeholder="CTA URL" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+        </div>
+      </div>
+
+      {/* Service Commitments */}
+      <div style={{ background: "#fff", borderRadius: 12, padding: 32, border: "1px solid #E5E7EB", marginBottom: 24 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Service Commitments</h2>
+        <input value={data.serviceCommitments.label} onChange={e => update("serviceCommitments", "label", e.target.value)} placeholder="Label" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8 }} />
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+          <input value={data.serviceCommitments.slaLabel} onChange={e => update("serviceCommitments", "slaLabel", e.target.value)} placeholder="SLA Label" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+          <input value={data.serviceCommitments.slaCta} onChange={e => update("serviceCommitments", "slaCta", e.target.value)} placeholder="SLA CTA Text" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+          <input value={data.serviceCommitments.slaLink} onChange={e => update("serviceCommitments", "slaLink", e.target.value)} placeholder="SLA CTA URL" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+        </div>
+
+        <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Tiers</h3>
+        {(data.serviceCommitments.tiers || []).map((t: any, i: number) => (
+          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+            <input value={t.tier || ""} onChange={e => updateArrayItem("serviceCommitments", "tiers", i, "tier", e.target.value)} placeholder="Tier" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+            <input value={t.response || ""} onChange={e => updateArrayItem("serviceCommitments", "tiers", i, "response", e.target.value)} placeholder="Response Time" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+            <input value={t.availability || ""} onChange={e => updateArrayItem("serviceCommitments", "tiers", i, "availability", e.target.value)} placeholder="Availability" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+            <button onClick={() => removeArrayItem("serviceCommitments", "tiers", i)} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 12px", border: "none", borderRadius: 6, cursor: "pointer" }}>✕</button>
+          </div>
+        ))}
+        <button onClick={() => addArrayItem("serviceCommitments", "tiers", { tier: "", response: "", availability: "" })} style={{ background: "#E5E7EB", padding: "8px 16px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500, marginTop: 8 }}>+ Add Tier</button>
+      </div>
+
+      {/* Incident Escalation */}
+      <div style={{ background: "#fff", borderRadius: 12, padding: 32, border: "1px solid #E5E7EB", marginBottom: 24 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Incident Escalation</h2>
+        <input value={data.incidentEscalation.title} onChange={e => update("incidentEscalation", "title", e.target.value)} placeholder="Title" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8 }} />
+        <textarea value={data.incidentEscalation.desc} onChange={e => update("incidentEscalation", "desc", e.target.value)} placeholder="Description" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8, height: 60 }} />
+        <input value={(data.incidentEscalation.steps || []).join(", ")} onChange={e => update("incidentEscalation", "steps", e.target.value.split(",").map((s:string) => s.trim()))} placeholder="Steps (comma separated)" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%" }} />
+      </div>
+
+      {/* Recovery */}
+      <div style={{ background: "#fff", borderRadius: 12, padding: 32, border: "1px solid #E5E7EB", marginBottom: 24 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Recovery (RTO/RPO)</h2>
+        <input value={data.recovery.title} onChange={e => update("recovery", "title", e.target.value)} placeholder="Title" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 16 }} />
+        
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+          <div style={{ border: "1px solid #E5E7EB", padding: 16, borderRadius: 8 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>RTO</h3>
+            <input value={data.recovery.rto.title} onChange={e => updateNested("recovery", "rto", "title", e.target.value)} placeholder="Title" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8 }} />
+            <input value={data.recovery.rto.label} onChange={e => updateNested("recovery", "rto", "label", e.target.value)} placeholder="Label" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8 }} />
+            <textarea value={data.recovery.rto.desc} onChange={e => updateNested("recovery", "rto", "desc", e.target.value)} placeholder="Description" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8 }} />
+            <input value={data.recovery.rto.value} onChange={e => updateNested("recovery", "rto", "value", e.target.value)} placeholder="Value" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%" }} />
+          </div>
+          <div style={{ border: "1px solid #E5E7EB", padding: 16, borderRadius: 8 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>RPO</h3>
+            <input value={data.recovery.rpo.title} onChange={e => updateNested("recovery", "rpo", "title", e.target.value)} placeholder="Title" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8 }} />
+            <input value={data.recovery.rpo.label} onChange={e => updateNested("recovery", "rpo", "label", e.target.value)} placeholder="Label" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8 }} />
+            <textarea value={data.recovery.rpo.desc} onChange={e => updateNested("recovery", "rpo", "desc", e.target.value)} placeholder="Description" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8 }} />
+            <input value={data.recovery.rpo.value} onChange={e => updateNested("recovery", "rpo", "value", e.target.value)} placeholder="Value" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%" }} />
+          </div>
+        </div>
+
+        <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Recovery CTAs</h3>
+        {(data.recovery.ctas || []).map((cta: any, i: number) => (
+          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+            <input value={cta.text || ""} onChange={e => updateArrayItem("recovery", "ctas", i, "text", e.target.value)} placeholder="CTA Text" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+            <input value={cta.link || ""} onChange={e => updateArrayItem("recovery", "ctas", i, "link", e.target.value)} placeholder="CTA URL" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+            <button onClick={() => removeArrayItem("recovery", "ctas", i)} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 12px", border: "none", borderRadius: 6, cursor: "pointer" }}>✕</button>
+          </div>
+        ))}
+        <button onClick={() => addArrayItem("recovery", "ctas", { text: "", link: "" })} style={{ background: "#E5E7EB", padding: "8px 16px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500, marginTop: 8 }}>+ Add Recovery CTA</button>
+      </div>
+
+      {/* Change Management */}
+      <div style={{ background: "#fff", borderRadius: 12, padding: 32, border: "1px solid #E5E7EB", marginBottom: 24 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Change Management</h2>
+        <input value={data.changeManagement.label} onChange={e => update("changeManagement", "label", e.target.value)} placeholder="Label" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8 }} />
+        <textarea value={data.changeManagement.title} onChange={e => update("changeManagement", "title", e.target.value)} placeholder="Title" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8, height: 60 }} />
+        <textarea value={data.changeManagement.descTop} onChange={e => update("changeManagement", "descTop", e.target.value)} placeholder="Description Top" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8, height: 60 }} />
+        <input value={(data.changeManagement.factors || []).join(", ")} onChange={e => update("changeManagement", "factors", e.target.value.split(",").map((s:string) => s.trim()))} placeholder="Factors (comma separated)" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8 }} />
+        <textarea value={data.changeManagement.descBottom} onChange={e => update("changeManagement", "descBottom", e.target.value)} placeholder="Description Bottom" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 16, height: 60 }} />
+        <input value={(data.changeManagement.steps || []).join(", ")} onChange={e => update("changeManagement", "steps", e.target.value.split(",").map((s:string) => s.trim()))} placeholder="Steps (comma separated)" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%" }} />
+      </div>
+
+      {/* Runbook Library */}
+      <div style={{ background: "#fff", borderRadius: 12, padding: 32, border: "1px solid #E5E7EB", marginBottom: 24 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Runbook Library</h2>
+        <input value={data.runbookLibrary.label} onChange={e => update("runbookLibrary", "label", e.target.value)} placeholder="Label" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 16 }} />
+        
+        {(data.runbookLibrary.documents || []).map((doc: any, i: number) => (
+          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+            <input value={doc.name || ""} onChange={e => updateArrayItem("runbookLibrary", "documents", i, "name", e.target.value)} placeholder="Document Name" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 2 }} />
+            <input value={doc.type || ""} onChange={e => updateArrayItem("runbookLibrary", "documents", i, "type", e.target.value)} placeholder="Type" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+            <input value={doc.link || ""} onChange={e => updateArrayItem("runbookLibrary", "documents", i, "link", e.target.value)} placeholder="URL" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 2 }} />
+            <button onClick={() => removeArrayItem("runbookLibrary", "documents", i)} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 12px", border: "none", borderRadius: 6, cursor: "pointer" }}>✕</button>
+          </div>
+        ))}
+        <button onClick={() => addArrayItem("runbookLibrary", "documents", { name: "", type: "PDF", link: "#" })} style={{ background: "#E5E7EB", padding: "8px 16px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500, marginTop: 8 }}>+ Add Runbook</button>
+      </div>
+
+      {/* Health Monitoring */}
+      <div style={{ background: "#fff", borderRadius: 12, padding: 32, border: "1px solid #E5E7EB", marginBottom: 24 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Health Monitoring</h2>
+        <input value={data.healthMonitoring.label} onChange={e => update("healthMonitoring", "label", e.target.value)} placeholder="Label" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8 }} />
+        <textarea value={data.healthMonitoring.title} onChange={e => update("healthMonitoring", "title", e.target.value)} placeholder="Title" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8, height: 60 }} />
+        <textarea value={data.healthMonitoring.desc} onChange={e => update("healthMonitoring", "desc", e.target.value)} placeholder="Description" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8, height: 60 }} />
+        <input value={(data.healthMonitoring.areas || []).join(", ")} onChange={e => update("healthMonitoring", "areas", e.target.value.split(",").map((s:string) => s.trim()))} placeholder="Areas (comma separated)" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 16 }} />
+        <div style={{ display: "flex", gap: 8 }}>
+          <input value={data.healthMonitoring.cta} onChange={e => update("healthMonitoring", "cta", e.target.value)} placeholder="CTA Text" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+          <input value={data.healthMonitoring.link} onChange={e => update("healthMonitoring", "link", e.target.value)} placeholder="CTA URL" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+        </div>
+      </div>
+
+      {/* Operational Documents */}
+      <div style={{ background: "#fff", borderRadius: 12, padding: 32, border: "1px solid #E5E7EB", marginBottom: 24 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Operational Documents</h2>
+        <input value={data.operationalDocuments.label} onChange={e => update("operationalDocuments", "label", e.target.value)} placeholder="Label" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 16 }} />
+        
+        {(data.operationalDocuments.documents || []).map((doc: any, i: number) => (
+          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+            <input value={doc.name || ""} onChange={e => updateArrayItem("operationalDocuments", "documents", i, "name", e.target.value)} placeholder="Document Name" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 2 }} />
+            <input value={doc.updated || ""} onChange={e => updateArrayItem("operationalDocuments", "documents", i, "updated", e.target.value)} placeholder="Updated (e.g. MAR 2026)" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 1 }} />
+            <input value={doc.link || ""} onChange={e => updateArrayItem("operationalDocuments", "documents", i, "link", e.target.value)} placeholder="URL" style={{ padding: 8, border: "1px solid #D1D5DB", borderRadius: 6, flex: 2 }} />
+            <button onClick={() => removeArrayItem("operationalDocuments", "documents", i)} style={{ background: "#FEE2E2", color: "#B91C1C", padding: "8px 12px", border: "none", borderRadius: 6, cursor: "pointer" }}>✕</button>
+          </div>
+        ))}
+        <button onClick={() => addArrayItem("operationalDocuments", "documents", { name: "", updated: "", link: "#" })} style={{ background: "#E5E7EB", padding: "8px 16px", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13, fontWeight: 500, marginTop: 8 }}>+ Add Document</button>
       </div>
 
       {/* Operating Principle */}
@@ -201,14 +386,6 @@ export default function OperationsEvidenceEditor({ site }: { site: string }) {
         <textarea value={data.operatingPrinciple.desc} onChange={e => update("operatingPrinciple", "desc", e.target.value)} placeholder="Description" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", height: 60 }} />
       </div>
 
-      <div style={{ background: "#fff", borderRadius: 12, padding: 32, border: "1px solid #E5E7EB", marginBottom: 24 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>This is a subset of fields for demonstration</h2>
-        <p style={{ fontSize: 14, color: "#6B7280" }}>Since Operations Evidence is highly structured, all JSON content fields are available and editable directly via Supabase for maximum flexibility, while key strings are mapped here. In a full system, you would iterate over `operatingModel`, `serviceCommitments`, etc. similar to the NetSuite Editor.</p>
-        
-        <h3 style={{ fontSize: 14, fontWeight: 600, marginTop: 16, marginBottom: 8 }}>Incident Escalation</h3>
-        <input value={data.incidentEscalation.title} onChange={e => update("incidentEscalation", "title", e.target.value)} placeholder="Title" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%", marginBottom: 8 }} />
-        <input value={data.incidentEscalation.steps.join(", ")} onChange={e => update("incidentEscalation", "steps", e.target.value.split(",").map(s => s.trim()))} placeholder="Steps (comma separated)" style={{ padding: 10, border: "1px solid #D1D5DB", borderRadius: 6, width: "100%" }} />
-      </div>
     </div>
   );
 }
