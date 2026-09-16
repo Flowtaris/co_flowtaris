@@ -24,33 +24,34 @@ export default function JudgmentPage() {
 
   useEffect(() => {
     async function fetchData() {
-      if (!supabase) { setLoading(false); return; }
-      const { data } = await supabase
-        .from("page_content")
-        .select("content")
-        .eq("id", "judgment")
-        .single();
-        
-      if (data?.content) {
-        setJudgmentContent({
-          title: data.content.title || "HOW WE THINK.",
-          subtitle: data.content.subtitle || "Written by the people making the decisions.",
-          description: data.content.description || "Decisions made under pressure.\\nWhat we chose. What we rejected.\\nWhat happened next.",
-          bridgeTitle: data.content.bridgeTitle || "THE DECISIONS BECOME PRINCIPLES.",
-          bridgeSubtitle: data.content.bridgeSubtitle || "Repeated judgment becomes an operating system.",
-          bridgeCtaText: data.content.bridgeCtaText || "EXPLORE PRINCIPLES →",
-          bridgeCtaLink: data.content.bridgeCtaLink || "/principles"
-        });
-        if (data.content.logs) {
-          setDecisionLogs(data.content.logs);
+      try {
+        const res = await fetch('/api/content/co?table=page_content&id=judgment');
+        const { data } = await res.json();
+        const content = data && data.length > 0 ? data[0].content : null;
+
+        if (content) {
+          setJudgmentContent({
+            title: content.title || "HOW WE THINK.",
+            subtitle: content.subtitle || "Written by the people making the decisions.",
+            description: content.description || "Decisions made under pressure.\\nWhat we chose. What we rejected.\\nWhat happened next.",
+            bridgeTitle: content.bridgeTitle || "THE DECISIONS BECOME PRINCIPLES.",
+            bridgeSubtitle: content.bridgeSubtitle || "Repeated judgment becomes an operating system.",
+            bridgeCtaText: content.bridgeCtaText || "EXPLORE PRINCIPLES →",
+            bridgeCtaLink: content.bridgeCtaLink || "/principles"
+          });
+          if (content.logs) {
+            setDecisionLogs(content.logs);
+          }
+        } else {
+          // Fallback default logs if not found
+          setDecisionLogs([
+            { id: "01", date: "15 MAR 2026", author: "CEO", tags: ["STRATEGY", "PRICING"], title: "WHY WE MOVED FROM\nT&M TO OUTCOME-BASED PRICING", excerpt: "Clients wanted certainty. We wanted alignment.\nHere's the model that works for both -- and the\nthree clients who said no.", principle: "Price for the outcome, not the hour.", href: "/judgment/pricing" },
+            { id: "02", date: "03 FEB 2026", author: "CTO", tags: ["TECH", "CRISIS"], title: "THE NETSUITE 2024.2 API CRISIS", excerpt: "47 clients. Six weeks. One platform change\nthat couldn't wait.", principle: "Platform risk is our risk. We absorb it.", href: "/judgment/netsuite" },
+            { id: "03", date: "10 JAN 2026", author: "COO", tags: ["HIRING", "CULTURE"], title: "WHY WE HIRED A PRINCIPAL\nBEFORE WE NEEDED ONE", excerpt: "Capacity planning isn't about today's utilization.\nIt's about tomorrow's risk.", principle: "Hire for the crisis, not the comfort.", href: "/judgment/hiring" }
+          ]);
         }
-      } else {
-        // Fallback default logs if not found
-        setDecisionLogs([
-          { id: "01", date: "15 MAR 2026", author: "CEO", tags: ["STRATEGY", "PRICING"], title: "WHY WE MOVED FROM\nT&M TO OUTCOME-BASED PRICING", excerpt: "Clients wanted certainty. We wanted alignment.\nHere's the model that works for both -- and the\nthree clients who said no.", principle: "Price for the outcome, not the hour.", href: "/judgment/pricing" },
-          { id: "02", date: "03 FEB 2026", author: "CTO", tags: ["TECH", "CRISIS"], title: "THE NETSUITE 2024.2 API CRISIS", excerpt: "47 clients. Six weeks. One platform change\nthat couldn't wait.", principle: "Platform risk is our risk. We absorb it.", href: "/judgment/netsuite" },
-          { id: "03", date: "10 JAN 2026", author: "COO", tags: ["HIRING", "CULTURE"], title: "WHY WE HIRED A PRINCIPAL\nBEFORE WE NEEDED ONE", excerpt: "Capacity planning isn't about today's utilization.\nIt's about tomorrow's risk.", principle: "Hire for the crisis, not the comfort.", href: "/judgment/hiring" }
-        ]);
+      } catch (err) {
+        console.error(err);
       }
       setLoading(false);
     }
