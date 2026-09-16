@@ -5,7 +5,6 @@ import Link from "next/link";
 
 // ── Editor Components ──────────────────────────────────────────────
 import HeroEditor from "./HeroEditor";
-import TrustEditor from "./TrustEditor";
 import JudgmentEditor from "./JudgmentEditor";
 import JudgmentSlugsEditor from "./JudgmentSlugsEditor";
 import PrinciplesEditor from "./PrinciplesEditor";
@@ -49,7 +48,6 @@ const sidebarLinks = [
   { id: "judgment", label: "Judgment Page", icon: <Scale size={18} /> },
   { id: "judgment_slugs", label: "Judgment Slugs", icon: <FileText size={18} /> },
   { id: "principles", label: "Principles", icon: <BookOpen size={18} /> },
-  { id: "statement", label: "Trust Statement", icon: <MessageSquare size={18} /> },
   { id: "leverage", label: "Leverage Page", icon: <Grid size={18} /> },
   { id: "register", label: "Deal Registration", icon: <FileText size={18} /> },
   { id: "evidence", label: "Evidence Main", icon: <ShieldCheck size={18} /> },
@@ -208,7 +206,6 @@ export default function AdminPage() {
           {/* ── Section Editors ── */}
           {activeTab === "hero"           && <HeroEditor site={activeSite} />}
           {activeTab === "home_sections"  && <HomeSectionsEditor site={activeSite} />}
-          {activeTab === "trust"          && <TrustEditor site={activeSite} />}
           {activeTab === "judgment"       && <JudgmentEditor site={activeSite} />}
           {activeTab === "judgment_slugs" && <JudgmentSlugsEditor site={activeSite} />}
           {activeTab === "principles"     && <PrinciplesEditor site={activeSite} />}
@@ -228,19 +225,6 @@ export default function AdminPage() {
           {activeTab === "footer"         && <FooterEditor site={activeSite} />}
 
           {/* ── Placeholder Tabs ── */}
-          {activeTab === "statement" && (
-            <div style={{ maxWidth: 800 }}>
-              <h1 style={{ fontSize: 24, fontWeight: "bold", color: "#111827", marginBottom: 24, textTransform: "capitalize" }}>{activeTab.replace("-", " ")}</h1>
-              <div style={{ background: "#fff", borderRadius: 12, padding: 40, textAlign: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.05)", border: "1px solid #E5E7EB" }}>
-                <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 64, height: 64, borderRadius: "50%", background: "#F3F4F6", marginBottom: 16 }}>
-                  <FileBox size={24} color="#9CA3AF" />
-                </div>
-                <h3 style={{ fontSize: 18, fontWeight: 500, color: "#111827", marginBottom: 8 }}>Section Under Construction</h3>
-                <p style={{ color: "#6B7280", maxWidth: 400, margin: "0 auto" }}>This section is ready to be connected to your Supabase schema when you need dynamic content here.</p>
-              </div>
-            </div>
-          )}
-
         </main>
       </div>
     </div>
