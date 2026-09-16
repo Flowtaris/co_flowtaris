@@ -48,8 +48,8 @@ export async function POST(req: NextRequest) {
       });
 
       if (error) {
-        console.error('Resend error:', error);
-        return NextResponse.json({ error: 'Failed to send email: ' + error.message }, { status: 500 });
+        console.warn('Email notification failed (but data was saved):', error);
+        // We do not return 500 here because the registration is already saved in the database.
       }
     } else {
       console.warn('RESEND_API_KEY is not set. Email was not sent.');
