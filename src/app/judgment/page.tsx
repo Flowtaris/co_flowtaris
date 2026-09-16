@@ -14,7 +14,11 @@ export default function JudgmentPage() {
   const [judgmentContent, setJudgmentContent] = useState<any>({
     title: "HOW WE THINK.",
     subtitle: "Written by the people making the decisions.",
-    description: "Decisions made under pressure.\\nWhat we chose. What we rejected.\\nWhat happened next."
+    description: "Decisions made under pressure.\\nWhat we chose. What we rejected.\\nWhat happened next.",
+    bridgeTitle: "THE DECISIONS BECOME PRINCIPLES.",
+    bridgeSubtitle: "Repeated judgment becomes an operating system.",
+    bridgeCtaText: "EXPLORE PRINCIPLES →",
+    bridgeCtaLink: "/principles"
   });
   const [loading, setLoading] = useState(true);
 
@@ -31,7 +35,11 @@ export default function JudgmentPage() {
         setJudgmentContent({
           title: data.content.title || "HOW WE THINK.",
           subtitle: data.content.subtitle || "Written by the people making the decisions.",
-          description: data.content.description || "Decisions made under pressure.\\nWhat we chose. What we rejected.\\nWhat happened next."
+          description: data.content.description || "Decisions made under pressure.\\nWhat we chose. What we rejected.\\nWhat happened next.",
+          bridgeTitle: data.content.bridgeTitle || "THE DECISIONS BECOME PRINCIPLES.",
+          bridgeSubtitle: data.content.bridgeSubtitle || "Repeated judgment becomes an operating system.",
+          bridgeCtaText: data.content.bridgeCtaText || "EXPLORE PRINCIPLES →",
+          bridgeCtaLink: data.content.bridgeCtaLink || "/principles"
         });
         if (data.content.logs) {
           setDecisionLogs(data.content.logs);
@@ -233,9 +241,9 @@ export default function JudgmentPage() {
 
       {/* 4. Principles Bridge */}
       <section className="section final-cta" style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <h2 className="cta-headline section-heading">THE DECISIONS BECOME PRINCIPLES.</h2>
-        <div className="cta-subheadline">Repeated judgment becomes an operating system.</div>
-        <a href="/principles" className="judgment-cta">EXPLORE PRINCIPLES &rarr;</a>
+        <h2 className="cta-headline section-heading">{judgmentContent.bridgeTitle}</h2>
+        <div className="cta-subheadline">{judgmentContent.bridgeSubtitle}</div>
+        <a href={judgmentContent.bridgeCtaLink} className="judgment-cta">{judgmentContent.bridgeCtaText}</a>
       </section>
     </>
   );

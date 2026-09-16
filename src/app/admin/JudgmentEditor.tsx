@@ -6,6 +6,12 @@ export default function JudgmentEditor({ site }: { site: string }) {
   const [judgmentTitle, setJudgmentTitle] = useState("");
   const [judgmentSubtitle, setJudgmentSubtitle] = useState("");
   const [judgmentDescription, setJudgmentDescription] = useState("");
+  
+  const [bridgeTitle, setBridgeTitle] = useState("");
+  const [bridgeSubtitle, setBridgeSubtitle] = useState("");
+  const [bridgeCtaText, setBridgeCtaText] = useState("");
+  const [bridgeCtaLink, setBridgeCtaLink] = useState("");
+
   const [decisionLogs, setDecisionLogs] = useState<any[]>([]);
   const [newLog, setNewLog] = useState({ date: "", author: "", tags: "", title: "", excerpt: "", principle: "", href: "" });
   const [editingLogId, setEditingLogId] = useState<string | null>(null);
@@ -21,12 +27,24 @@ export default function JudgmentEditor({ site }: { site: string }) {
           setJudgmentTitle(data[0].content.title || "");
           setJudgmentSubtitle(data[0].content.subtitle || "");
           setJudgmentDescription(data[0].content.description || "");
+          
+          setBridgeTitle(data[0].content.bridgeTitle || "THE DECISIONS BECOME PRINCIPLES.");
+          setBridgeSubtitle(data[0].content.bridgeSubtitle || "Repeated judgment becomes an operating system.");
+          setBridgeCtaText(data[0].content.bridgeCtaText || "EXPLORE PRINCIPLES →");
+          setBridgeCtaLink(data[0].content.bridgeCtaLink || "/principles");
+
           setDecisionLogs(data[0].content.logs || []);
         } else {
           if (message) console.warn(message);
           setJudgmentTitle("HOW WE THINK.");
           setJudgmentSubtitle("Written by the people making the decisions.");
           setJudgmentDescription("Decisions made under pressure.\\nWhat we chose. What we rejected.\\nWhat happened next.");
+          
+          setBridgeTitle("THE DECISIONS BECOME PRINCIPLES.");
+          setBridgeSubtitle("Repeated judgment becomes an operating system.");
+          setBridgeCtaText("EXPLORE PRINCIPLES →");
+          setBridgeCtaLink("/principles");
+
           setDecisionLogs([]);
         }
       } catch (err) {
@@ -51,7 +69,7 @@ export default function JudgmentEditor({ site }: { site: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           table: "page_content",
-          record: { id: "judgment", content: { title: judgmentTitle, subtitle: judgmentSubtitle, description: judgmentDescription, logs: decisionLogs }, updated_at: new Date().toISOString() }
+          record: { id: "judgment", content: { title: judgmentTitle, subtitle: judgmentSubtitle, description: judgmentDescription, logs: decisionLogs, bridgeTitle, bridgeSubtitle, bridgeCtaText, bridgeCtaLink }, updated_at: new Date().toISOString() }
         })
       });
       if (!res.ok) {
@@ -73,7 +91,7 @@ export default function JudgmentEditor({ site }: { site: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           table: "page_content",
-          record: { id: "judgment", content: { title: judgmentTitle, subtitle: judgmentSubtitle, description: judgmentDescription, logs: updatedLogs }, updated_at: new Date().toISOString() }
+          record: { id: "judgment", content: { title: judgmentTitle, subtitle: judgmentSubtitle, description: judgmentDescription, logs: updatedLogs, bridgeTitle, bridgeSubtitle, bridgeCtaText, bridgeCtaLink }, updated_at: new Date().toISOString() }
         })
       });
       if (!res.ok) {
@@ -155,6 +173,30 @@ export default function JudgmentEditor({ site }: { site: string }) {
           <textarea value={judgmentDescription} onChange={(e) => setJudgmentDescription(e.target.value)} style={{ width: "100%", height: 80, background: "#F9FAFB", border: "1px solid #D1D5DB", padding: 16, borderRadius: 8, fontSize: 14, fontFamily: "inherit", resize: "vertical" }} />
         </div>
         <button onClick={saveJudgmentContent} style={{ background: "#2563EB", color: "#fff", padding: "10px 24px", border: "none", borderRadius: 6, cursor: "pointer", fontWeight: 500, fontSize: 14 }}>Save Hero Content</button>
+      </div>
+
+      {/* Principles Bridge Content */}
+      <div style={{ background: "#fff", borderRadius: 12, padding: 32, boxShadow: "0 1px 3px rgba(0,0,0,0.05)", border: "1px solid #E5E7EB", marginBottom: 32 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>Principles Bridge Section</h2>
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: "block", marginBottom: 8, fontSize: 14, fontWeight: 500, color: "#374151" }}>Headline</label>
+          <input type="text" value={bridgeTitle} onChange={(e) => setBridgeTitle(e.target.value)} style={{ width: "100%", background: "#F9FAFB", border: "1px solid #D1D5DB", padding: "10px 12px", borderRadius: 6, fontSize: 14 }} />
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: "block", marginBottom: 8, fontSize: 14, fontWeight: 500, color: "#374151" }}>Subheadline</label>
+          <input type="text" value={bridgeSubtitle} onChange={(e) => setBridgeSubtitle(e.target.value)} style={{ width: "100%", background: "#F9FAFB", border: "1px solid #D1D5DB", padding: "10px 12px", borderRadius: 6, fontSize: 14 }} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+          <div>
+            <label style={{ display: "block", marginBottom: 8, fontSize: 14, fontWeight: 500, color: "#374151" }}>CTA Text</label>
+            <input type="text" value={bridgeCtaText} onChange={(e) => setBridgeCtaText(e.target.value)} style={{ width: "100%", background: "#F9FAFB", border: "1px solid #D1D5DB", padding: "10px 12px", borderRadius: 6, fontSize: 14 }} />
+          </div>
+          <div>
+            <label style={{ display: "block", marginBottom: 8, fontSize: 14, fontWeight: 500, color: "#374151" }}>CTA Link</label>
+            <input type="text" value={bridgeCtaLink} onChange={(e) => setBridgeCtaLink(e.target.value)} style={{ width: "100%", background: "#F9FAFB", border: "1px solid #D1D5DB", padding: "10px 12px", borderRadius: 6, fontSize: 14 }} />
+          </div>
+        </div>
+        <button onClick={saveJudgmentContent} style={{ background: "#2563EB", color: "#fff", padding: "10px 24px", border: "none", borderRadius: 6, cursor: "pointer", fontWeight: 500, fontSize: 14 }}>Save Bridge Content</button>
       </div>
 
       {/* Add/Edit Log */}
