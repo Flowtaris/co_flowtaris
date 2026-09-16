@@ -120,7 +120,7 @@ export default async function Home() {
               <div key={pdf.id} className="trust-card">
                 <h3 className="card-heading">{pdf.title}</h3>
                 <p className="trust-desc card-description">PDF Document</p>
-                <a href={pdf.url} target="_blank" rel="noreferrer" className="trust-cta">VIEW DOCUMENT &rarr;</a>
+                <a href={`/api/download?url=${encodeURIComponent(pdf.url)}`} target="_blank" rel="noreferrer" className="trust-cta">VIEW DOCUMENT &rarr;</a>
               </div>
             ))}
           </div>
